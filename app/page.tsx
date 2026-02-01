@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import PixelBlast from "@/components/PixelBlast";
 import { Link2, Network, Zap, CheckCircle2, FileCode, Lock } from "lucide-react";
 
@@ -56,7 +57,8 @@ export default function Home() {
           <div className="flex gap-8 items-center">
             <a href="#features" className="text-sm transition-colors hover:text-white" style={{ color: "#CBD5E1" }}>Features</a>
             <a href="#faq" className="text-sm transition-colors hover:text-white" style={{ color: "#CBD5E1" }}>FAQ</a>
-            <button 
+            <Link 
+              href="/memories"
               className="px-6 py-2 rounded-lg font-medium text-sm transition-all hover:opacity-90"
               style={{ 
                 background: "#3B82F6",
@@ -64,7 +66,7 @@ export default function Home() {
               }}
             >
               Get Started
-            </button>
+            </Link>
           </div>
         </div>
       </nav>
@@ -91,24 +93,26 @@ export default function Home() {
             Synapse lets you capture PDFs, notes, images, screenshots, and videos as structured memories that are automatically understood, summarized, and made searchable by meaning—so you can always find the exact idea, quote, or insight you saved, no matter where it came from.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <button 
-              className="px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 hover:opacity-90"
+            <Link 
+              href="/memories"
+              className="px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 hover:opacity-90 text-center"
               style={{ 
                 background: "#3B82F6",
                 color: "#FFFFFF"
               }}
             >
               Start Free Trial
-            </button>
-            <button 
-              className="px-8 py-3 rounded-lg font-medium border transition-colors hover:bg-white/5"
+            </Link>
+            <Link 
+              href="/memories"
+              className="px-8 py-3 rounded-lg font-medium border transition-colors hover:bg-white/5 text-center"
               style={{ 
                 color: "#FFFFFF",
                 borderColor: "#64748B"
               }}
             >
               View Demo
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -307,15 +311,16 @@ export default function Home() {
           <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: "#E2E8F0" }}>
               Start capturing memories from anywhere—PDFs, notes, images, videos. Let Synapse understand, organize, and make everything searchable by meaning. Your knowledge, amplified.
           </p>
-          <button 
-            className="px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 hover:opacity-90"
+          <Link 
+            href="/memories"
+            className="inline-block px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 hover:opacity-90"
             style={{ 
               background: "#3B82F6",
               color: "#FFFFFF"
             }}
           >
             Start Building Your Second Brain
-          </button>
+          </Link>
         </div>
       </section>
 
