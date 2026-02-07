@@ -7,10 +7,11 @@ import {
   getChat,
   sendChatMessageToChat,
   deleteChat,
+  updateChatTitle,
   type ChatListItem,
   type ChatMessageOut,
 } from "@/lib/api";
-import { Loader2, Send, Plus, MessageSquare, Trash2, PanelLeftClose, PanelLeft } from "lucide-react";
+import { Loader2, Send, Plus, MessageSquare, Trash2, PanelLeftClose, PanelLeft, Pencil } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 function formatChatDate(iso: string): string {
@@ -35,7 +36,10 @@ export default function ChatPage() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [editingChatId, setEditingChatId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const editInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -87,6 +91,38 @@ export default function ChatPage() {
       setActiveTitle("New chat");
     }
   }, [activeChatId, loadChat]);
+
+  const startEditTitle = (chat: ChatListItem) => {
+    setEditingChatId(chat.id);
+    setEditingValue(chat.title);
+    setTimeout(() => editInputRef.current?.focus(), 0);
+  };
+
+  const saveEditTitle = useCallback(async () => {
+    if (!editingChatId) return;
+    const title = editingValue.trim() || "New chat";
+    const chatIdToSave = editingChatId;
+    try {
+      const updated = await updateChatTitle(chatIdToSave, title);
+      setEditingChatId(null);
+      setEditingValue("");
+      setChats((prev) =>
+        prev.map((c) => (c.id === updated.id ? { ...c, title: updated.title, updatedAt: updated.updatedAt } : c))
+      );
+      if (activeChatId === chatIdToSave) setActiveTitle(updated.title);
+    } catch {
+      // keep editing state on failure
+    }
+  }, [editingChatId, editingValue, activeChatId]);
+
+  const cancelEditTitle = () => {
+    setEditingChatId(null);
+    setEditingValue("");
+  };
+
+  useEffect(() => {
+    if (editingChatId) editInputRef.current?.focus();
+  }, [editingChatId]);
 
   const handleNewChat = async () => {
     setError(null);
@@ -223,8 +259,9 @@ export default function ChatPage() {
                   <div
                     role="button"
                     tabIndex={0}
-                    onClick={() => setActiveChatId(chat.id)}
+                    onClick={() => editingChatId !== chat.id && setActiveChatId(chat.id)}
                     onKeyDown={(e) => {
+                      if (editingChatId === chat.id) return;
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
                         setActiveChatId(chat.id);
@@ -236,7 +273,47 @@ export default function ChatPage() {
                     style={{ color: "#E2E8F0" }}
                   >
                     <MessageSquare className="w-4 h-4 shrink-0 text-slate-500" />
-                    <span className="flex-1 truncate text-sm">{chat.title}</span>
+                    {editingChatId === chat.id ? (
+                      <div className="flex-1 min-w-0 flex items-center" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          ref={editingChatId === chat.id ? editInputRef : undefined}
+                          type="text"
+                          value={editingValue}
+                          onChange={(e) => setEditingValue(e.target.value)}
+                          onBlur={saveEditTitle}
+                          onKeyDown={(e) => {
+                            e.stopPropagation();
+                            if (e.key === "Enter") saveEditTitle();
+                            if (e.key === "Escape") cancelEditTitle();
+                          }}
+                          className="w-full min-w-0 px-1.5 py-0.5 text-sm rounded bg-white/10 border border-white/20 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          style={{ color: "#E2E8F0" }}
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <span
+                          className="flex-1 truncate text-sm"
+                          onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            startEditTitle(chat);
+                          }}
+                        >
+                          {chat.title}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            startEditTitle(chat);
+                          }}
+                          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-white/10 text-slate-400 shrink-0"
+                          title="Edit title"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                      </>
+                    )}
                     <span className="text-xs shrink-0" style={{ color: "#64748B" }}>
                       {formatChatDate(chat.updatedAt)}
                     </span>

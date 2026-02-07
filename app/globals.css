@@ -34,6 +34,15 @@ body {
   font-family: var(--font-geist-sans);
 }
 
+/* Pointer cursor for all clickable controls */
+button,
+a,
+[role="button"],
+input[type="submit"],
+input[type="button"] {
+  cursor: pointer;
+}
+
 .instrument-serif {
   font-family: "Instrument Serif", serif;
   font-weight: 400;

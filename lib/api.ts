@@ -252,6 +252,13 @@ export async function sendChatMessageToChat(
   );
 }
 
+export async function updateChatTitle(chatId: string, title: string): Promise<ChatListItem> {
+  return api<ChatListItem>(`/api/chats/${chatId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ title: title.trim() }),
+  });
+}
+
 export async function deleteChat(chatId: string): Promise<void> {
   return api<void>(`/api/chats/${chatId}`, { method: "DELETE" });
 }
