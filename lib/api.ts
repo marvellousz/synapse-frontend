@@ -185,4 +185,75 @@ export const searchAPI = {
   },
 };
 
+/** Chat (RAG over memories) - legacy single-message endpoint */
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export async function sendChatMessage(
+  message: string,
+  history?: ChatMessage[]
+): Promise<{ reply: string }> {
+  return api<{ reply: string }>("/api/chat", {
+    method: "POST",
+    body: JSON.stringify({
+      message,
+      history: history ?? [],
+    }),
+  });
+}
+
+/** Chats (DB-backed history) */
+export interface ChatListItem {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChatMessageOut {
+  id: string;
+  role: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface ChatWithMessages {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  messages: ChatMessageOut[];
+}
+
+export async function listChats(): Promise<ChatListItem[]> {
+  return api<ChatListItem[]>("/api/chats");
+}
+
+export async function createChat(title?: string): Promise<ChatListItem> {
+  return api<ChatListItem>("/api/chats", {
+    method: "POST",
+    body: JSON.stringify(title != null ? { title } : {}),
+  });
+}
+
+export async function getChat(chatId: string): Promise<ChatWithMessages> {
+  return api<ChatWithMessages>(`/api/chats/${chatId}`);
+}
+
+export async function sendChatMessageToChat(
+  chatId: string,
+  message: string
+): Promise<{ reply: string; userMessageId: string; assistantMessageId: string }> {
+  return api<{ reply: string; userMessageId: string; assistantMessageId: string }>(
+    `/api/chats/${chatId}/messages`,
+    { method: "POST", body: JSON.stringify({ message }) }
+  );
+}
+
+export async function deleteChat(chatId: string): Promise<void> {
+  return api<void>(`/api/chats/${chatId}`, { method: "DELETE" });
+}
+
 type Memory = import("./types").Memory;

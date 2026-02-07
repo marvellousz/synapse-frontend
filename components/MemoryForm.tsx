@@ -2,9 +2,23 @@
 
 import { useState } from "react";
 import type { Memory, MemoryCreate, MemoryUpdate } from "@/lib/types";
+import Dropdown from "@/components/Dropdown";
 
 const TYPES = ["pdf", "image", "video", "text", "webpage", "youtube"] as const;
+const TYPE_OPTIONS = [
+  { value: "pdf" as const, label: "PDF" },
+  { value: "image" as const, label: "Image" },
+  { value: "video" as const, label: "Video" },
+  { value: "text" as const, label: "Text" },
+  { value: "webpage" as const, label: "Webpage" },
+  { value: "youtube" as const, label: "YouTube" },
+];
 const STATUSES = ["processing", "ready", "failed"] as const;
+const STATUS_OPTIONS = [
+  { value: "processing" as const, label: "Processing" },
+  { value: "ready" as const, label: "Ready" },
+  { value: "failed" as const, label: "Failed" },
+];
 const FILE_TYPES = ["pdf", "image", "video"] as const;
 
 function generateContentHash(): string {
@@ -72,25 +86,16 @@ export default function MemoryForm(props: Props) {
         </div>
       )}
       {isCreate && (
-        <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "#94A3B8" }}>Type</label>
-          <select
-            value={type}
-            onChange={(e) => {
-              const t = e.target.value as Memory["type"];
-              setType(t);
-              if (t !== "webpage" && t !== "youtube") setSourceUrl("");
-            }}
-            className="w-full px-4 py-2 rounded-lg border bg-white/5 text-white"
-            style={{ borderColor: "rgba(148, 163, 184, 0.3)" }}
-          >
-            {TYPES.map((t) => (
-              <option key={t} value={t} className="bg-slate-800 text-white">
-                {t}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Dropdown
+          label="Type"
+          value={type}
+          options={TYPE_OPTIONS}
+          onChange={(t) => {
+            setType(t as Memory["type"]);
+            if (t !== "webpage" && t !== "youtube") setSourceUrl("");
+          }}
+          placeholder="Select type"
+        />
       )}
       {showFileUpload && (
         <div>
@@ -155,21 +160,13 @@ export default function MemoryForm(props: Props) {
         </div>
       )}
       {!isCreate && (
-        <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "#94A3B8" }}>Status</label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as Memory["status"])}
-            className="w-full px-4 py-2 rounded-lg border bg-white/5 text-white"
-            style={{ borderColor: "rgba(148, 163, 184, 0.3)" }}
-          >
-            {STATUSES.map((s) => (
-              <option key={s} value={s} className="bg-slate-800 text-white">
-                {s}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Dropdown
+          label="Status"
+          value={status}
+          options={STATUS_OPTIONS}
+          onChange={(s) => setStatus(s as Memory["status"])}
+          placeholder="Select status"
+        />
       )}
       <button
         type="submit"

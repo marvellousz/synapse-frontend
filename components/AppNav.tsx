@@ -47,6 +47,13 @@ export default function AppNav() {
               >
                 Search
               </Link>
+              <Link
+                href="/chat"
+                className="text-sm transition-colors hover:text-white"
+                style={{ color: "#CBD5E1" }}
+              >
+                Chat
+              </Link>
               <div
                 className="flex items-center gap-3 pl-5 border-l"
                 style={{ borderColor: "rgba(148, 163, 184, 0.2)" }}

@@ -48,7 +48,8 @@ export default function Dropdown<T extends string = string>({
       {label && (
         <label
           htmlFor={id}
-          className="block text-sm text-slate-400 mb-2"
+          className="block text-sm font-medium mb-1.5"
+          style={{ color: "#94A3B8" }}
         >
           {label}
         </label>
@@ -59,10 +60,10 @@ export default function Dropdown<T extends string = string>({
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-label={ariaLabel ?? label ?? placeholder}
-        className="w-full px-3 py-2.5 rounded-lg border text-left flex items-center justify-between gap-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+        className="w-full px-4 py-2.5 rounded-xl border text-left flex items-center justify-between gap-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 hover:border-slate-500"
         style={{
           backgroundColor: "rgba(15, 23, 42, 0.9)",
-          borderColor: "rgba(148, 163, 184, 0.3)",
+          borderColor: open ? "rgba(59, 130, 246, 0.5)" : "rgba(148, 163, 184, 0.3)",
           color: "#F8FAFC",
         }}
       >
@@ -73,21 +74,26 @@ export default function Dropdown<T extends string = string>({
               <span>{selected.label}</span>
             </>
           ) : (
-            <span className="text-slate-500">{placeholder}</span>
+            <span style={{ color: "#64748B" }}>{placeholder}</span>
           )}
         </span>
         <ChevronDown
-          className={`w-4 h-4 shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
+          className="w-4 h-4 shrink-0 transition-transform duration-200"
+          style={{
+            color: "#94A3B8",
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+          }}
         />
       </button>
 
       {open && (
         <ul
           role="listbox"
-          className="absolute z-50 mt-1 w-full min-w-[200px] rounded-lg border shadow-xl py-1 max-h-60 overflow-auto"
+          className="absolute z-50 mt-2 w-full min-w-[200px] rounded-xl border py-1.5 max-h-60 overflow-auto"
           style={{
             backgroundColor: "rgba(15, 23, 42, 0.98)",
             borderColor: "rgba(148, 163, 184, 0.25)",
+            boxShadow: "0 10px 40px -10px rgba(0,0,0,0.5)",
           }}
         >
           {options.map((opt) => {
@@ -108,12 +114,22 @@ export default function Dropdown<T extends string = string>({
                     setOpen(false);
                   }
                 }}
-                className="flex items-center gap-2 px-3 py-2.5 cursor-pointer transition-colors text-sm"
+                className="flex items-center gap-2.5 px-3.5 py-2.5 cursor-pointer transition-colors duration-150 text-sm rounded-lg mx-1"
                 style={{
                   color: "#F8FAFC",
                   backgroundColor: isSelected
                     ? "rgba(59, 130, 246, 0.25)"
                     : "transparent",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSelected) {
+                    e.currentTarget.style.backgroundColor = "rgba(148, 163, 184, 0.1)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = isSelected
+                    ? "rgba(59, 130, 246, 0.25)"
+                    : "transparent";
                 }}
               >
                 {opt.icon}
