@@ -7,7 +7,7 @@ import { listMemories } from "@/lib/api";
 import type { Memory } from "@/lib/types";
 import MemoryCard from "@/components/MemoryCard";
 import SemanticSearch from "@/components/SemanticSearch";
-import { PlusCircle, Loader2, Search } from "lucide-react";
+import { PlusCircle, Loader2, Search, X } from "lucide-react";
 
 export default function MemoriesPage() {
   const router = useRouter();
@@ -49,11 +49,11 @@ export default function MemoriesPage() {
             onClick={() => setShowSearch(!showSearch)}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all hover:opacity-90"
             style={{ 
-              background: showSearch ? "#7c3aed" : "#64748b",
+              background: showSearch ? "#dc2626" : "#64748b",
               color: "#FFFFFF"
             }}
           >
-            <Search className="w-4 h-4" />
+            {showSearch ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
             {showSearch ? "Hide" : "Search"}
           </button>
           <Link

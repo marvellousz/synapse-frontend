@@ -1,10 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import PixelBlast from "@/components/PixelBlast";
-import { Link2, Network, Zap, CheckCircle2, FileCode, Lock } from "lucide-react";
+import { Link2, Network, Zap, CheckCircle2, FileCode, Lock, ChevronDown } from "lucide-react";
 
 export default function Home() {
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  const toggleFaq = (index: number) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
   return (
     <div className="min-h-screen relative">
       {/* Full-page PixelBlast Background */}
@@ -48,7 +55,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <img 
-              src="/synapse.png" 
+              src="/synapse.jpg" 
               alt="Synapse" 
               className="h-8 w-auto"
             />
@@ -58,14 +65,14 @@ export default function Home() {
             <a href="#features" className="text-sm transition-colors hover:text-white" style={{ color: "#CBD5E1" }}>Features</a>
             <a href="#faq" className="text-sm transition-colors hover:text-white" style={{ color: "#CBD5E1" }}>FAQ</a>
             <Link 
-              href="/memories"
+              href="/login"
               className="px-6 py-2 rounded-lg font-medium text-sm transition-all hover:opacity-90"
               style={{ 
                 background: "#3B82F6",
                 color: "#FFFFFF"
               }}
             >
-              Get Started
+              Login
             </Link>
           </div>
         </div>
@@ -101,7 +108,7 @@ export default function Home() {
                 color: "#FFFFFF"
               }}
             >
-              Start Free Trial
+              Get Started
             </Link>
             <Link 
               href="/memories"
@@ -284,14 +291,29 @@ export default function Home() {
           ].map((faq, index) => (
             <div
               key={index}
-              className="glass-soft p-6 rounded-3xl border transition-all hover:-translate-y-0.5 hover:shadow-xl"
+              className="glass-soft rounded-3xl border overflow-hidden transition-all hover:shadow-xl"
             >
-              <h3 className="text-lg font-semibold mb-3" style={{ color: "#FFFFFF" }}>
-                {faq.question}
-              </h3>
-              <p className="leading-relaxed" style={{ color: "#CBD5E1" }}>
-                {faq.answer}
-              </p>
+              <button
+                onClick={() => toggleFaq(index)}
+                className="w-full p-6 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+              >
+                <h3 className="text-lg font-semibold pr-4" style={{ color: "#FFFFFF" }}>
+                  {faq.question}
+                </h3>
+                <ChevronDown 
+                  className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 ${openFaqIndex === index ? 'rotate-180' : ''}`}
+                  style={{ color: "#94A3B8" }}
+                />
+              </button>
+              <div 
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  openFaqIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
+                <p className="px-6 pb-6 leading-relaxed" style={{ color: "#CBD5E1" }}>
+                  {faq.answer}
+                </p>
+              </div>
             </div>
           ))}
         </div>

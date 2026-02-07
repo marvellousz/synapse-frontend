@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Memory, MemoryCreate, MemoryUpdate } from "@/lib/types";
 
-const TYPES = ["pdf", "image", "video", "text", "webpage"] as const;
+const TYPES = ["pdf", "image", "video", "text", "webpage", "youtube"] as const;
 const STATUSES = ["processing", "ready", "failed"] as const;
 const FILE_TYPES = ["pdf", "image", "video"] as const;
 
@@ -44,7 +44,7 @@ export default function MemoryForm(props: Props) {
             contentHash: generateContentHash(),
             title: title || null,
             summary: summary || null,
-            sourceUrl: type === "webpage" ? (sourceUrl || null) : null,
+            sourceUrl: type === "webpage" || type === "youtube" ? (sourceUrl || null) : null,
             status: "processing",
           },
           files.length > 0 ? files : undefined
@@ -53,7 +53,7 @@ export default function MemoryForm(props: Props) {
         await props.onSubmit({
           title: title || null,
           summary: summary || null,
-          sourceUrl: type === "webpage" ? (sourceUrl || null) : null,
+          sourceUrl: type === "webpage" || type === "youtube" ? (sourceUrl || null) : null,
           status,
         });
       }
@@ -79,7 +79,7 @@ export default function MemoryForm(props: Props) {
             onChange={(e) => {
               const t = e.target.value as Memory["type"];
               setType(t);
-              if (t !== "webpage") setSourceUrl("");
+              if (t !== "webpage" && t !== "youtube") setSourceUrl("");
             }}
             className="w-full px-4 py-2 rounded-lg border bg-white/5 text-white"
             style={{ borderColor: "rgba(148, 163, 184, 0.3)" }}
@@ -139,16 +139,18 @@ export default function MemoryForm(props: Props) {
           placeholder="Optional summary"
         />
       </div>
-      {type === "webpage" && (
+      {(type === "webpage" || type === "youtube") && (
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "#94A3B8" }}>Source URL</label>
+          <label className="block text-sm font-medium mb-1" style={{ color: "#94A3B8" }}>
+            {type === "youtube" ? "YouTube video URL" : "Source URL"}
+          </label>
           <input
             type="url"
             value={sourceUrl}
             onChange={(e) => setSourceUrl(e.target.value)}
             className="w-full px-4 py-2 rounded-lg border bg-white/5 text-white placeholder:text-slate-500"
             style={{ borderColor: "rgba(148, 163, 184, 0.3)" }}
-            placeholder="https://..."
+            placeholder={type === "youtube" ? "https://www.youtube.com/watch?v=... or https://youtu.be/..." : "https://..."}
           />
         </div>
       )}

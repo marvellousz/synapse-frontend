@@ -18,7 +18,7 @@ export default function AppNav() {
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center gap-3">
-          <img src="/synapse.png" alt="Synapse" className="h-8 w-auto" />
+          <img src="/synapse.jpg" alt="Synapse" className="h-8 w-auto" />
           <span className="font-semibold text-lg" style={{ color: "#FFFFFF" }}>
             Synapse
           </span>
@@ -39,6 +39,13 @@ export default function AppNav() {
                 style={{ color: "#CBD5E1" }}
               >
                 Memories
+              </Link>
+              <Link
+                href="/search"
+                className="text-sm transition-colors hover:text-white"
+                style={{ color: "#CBD5E1" }}
+              >
+                Search
               </Link>
               <div
                 className="flex items-center gap-3 pl-5 border-l"

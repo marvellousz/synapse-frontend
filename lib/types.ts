@@ -7,7 +7,7 @@ export interface User {
   createdAt: string;
 }
 
-export type MemoryType = "pdf" | "image" | "video" | "text" | "webpage";
+export type MemoryType = "pdf" | "image" | "video" | "text" | "webpage" | "youtube";
 export type MemoryStatus = "processing" | "ready" | "failed";
 
 export interface Memory {

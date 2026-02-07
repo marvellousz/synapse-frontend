@@ -10,17 +10,19 @@ import {
   Video,
   FileCode,
   Globe,
-  ChevronDown,
+  Youtube,
   ChevronUp,
   Zap,
+  Brain,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { searchAPI } from "@/lib/api";
+import Dropdown from "@/components/Dropdown";
 
 interface SearchResult {
   memoryId: string;
   title: string;
-  contentType: "pdf" | "image" | "video" | "text" | "webpage";
+  contentType: "pdf" | "image" | "video" | "text" | "webpage" | "youtube";
   summary: string;
   sourceUrl?: string;
   createdAt: string;
@@ -53,6 +55,22 @@ export default function SemanticSearch({ onMemorySelect }: SearchTabProps) {
   );
   const [searchExecuted, setSearchExecuted] = useState(false);
 
+  const searchTypeOptions = [
+    { value: "hybrid" as const, label: "Hybrid (Semantic + Keywords)", icon: <Zap className="w-4 h-4 text-amber-400" /> },
+    { value: "semantic" as const, label: "Semantic (Meaning-based)", icon: <Brain className="w-4 h-4 text-pink-400" /> },
+    { value: "keyword" as const, label: "Keyword (Exact matches)", icon: <Search className="w-4 h-4 text-slate-400" /> },
+  ];
+
+  const contentTypeOptions = [
+    { value: "" as const, label: "All Types" },
+    { value: "pdf" as const, label: "PDF", icon: <FileText className="w-4 h-4" /> },
+    { value: "image" as const, label: "Image / Handwritten", icon: <ImageIcon className="w-4 h-4" /> },
+    { value: "video" as const, label: "Video", icon: <Video className="w-4 h-4" /> },
+    { value: "text" as const, label: "Text Notes", icon: <FileCode className="w-4 h-4" /> },
+    { value: "webpage" as const, label: "Webpages", icon: <Globe className="w-4 h-4" /> },
+    { value: "youtube" as const, label: "YouTube", icon: <Youtube className="w-4 h-4" /> },
+  ];
+
   const getContentIcon = (type: string) => {
     switch (type) {
       case "pdf":
@@ -65,6 +83,8 @@ export default function SemanticSearch({ onMemorySelect }: SearchTabProps) {
         return <FileCode className="w-4 h-4" />;
       case "webpage":
         return <Globe className="w-4 h-4" />;
+      case "youtube":
+        return <Youtube className="w-4 h-4" />;
       default:
         return <FileText className="w-4 h-4" />;
     }
@@ -162,43 +182,24 @@ export default function SemanticSearch({ onMemorySelect }: SearchTabProps) {
           <div className="flex flex-col sm:flex-row gap-3">
             {/* Search Type */}
             <div className="flex-1">
-              <label className="block text-sm text-slate-400 mb-2">
-                Search Type
-              </label>
-              <select
+              <Dropdown
+                label="Search Type"
                 value={searchType}
-                onChange={(e) =>
-                  setSearchType(e.target.value as typeof searchType)
-                }
-                className="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
-              >
-                <option value="hybrid">
-                  Hybrid (Semantic + Keywords) ⚡
-                </option>
-                <option value="semantic">
-                  Semantic (Meaning-based) 🧠
-                </option>
-                <option value="keyword">Keyword (Exact matches) 🔍</option>
-              </select>
+                options={searchTypeOptions}
+                onChange={(v) => setSearchType(v)}
+                placeholder="Search type"
+              />
             </div>
 
             {/* Content Type Filter */}
             <div className="flex-1">
-              <label className="block text-sm text-slate-400 mb-2">
-                Filter by Type
-              </label>
-              <select
+              <Dropdown
+                label="Filter by Type"
                 value={contentType}
-                onChange={(e) => setContentType(e.target.value)}
-                className="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
-              >
-                <option value="">All Types</option>
-                <option value="pdf">PDF</option>
-                <option value="image">Image / Handwritten</option>
-                <option value="video">Video</option>
-                <option value="text">Text Notes</option>
-                <option value="webpage">Webpages</option>
-              </select>
+                options={contentTypeOptions}
+                onChange={setContentType}
+                placeholder="All Types"
+              />
             </div>
 
             {/* Search Button */}
