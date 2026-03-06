@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut } from "lucide-react";
+import { LogOut, Brain } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -18,119 +18,61 @@ export default function AppNav() {
   const isAuth = state.status === "authenticated";
 
   return (
-    <nav
-      className="sticky top-0 z-50 rounded-b-2xl mx-4 mt-2 mb-0 shadow-lg"
-      style={{
-        background: "linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)",
-        border: "1px solid rgba(59, 130, 246, 0.15)",
-        borderTop: "none",
-        boxShadow: "0 8px 32px rgba(15, 23, 42, 0.6), 0 1px 0 rgba(148, 163, 184, 0.08)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-      }}
-    >
-      <div className="max-w-6xl mx-auto px-6 py-3.5 flex justify-between items-center">
-        <Link
-          href="/"
-          className="flex items-center gap-3 group rounded-xl px-2 py-1.5 -ml-2 transition-colors hover:bg-white/5 cursor-pointer"
-        >
-          <img
-            src="/synapse.jpg"
-            alt="Synapse"
-            className="h-9 w-auto rounded-lg ring-1 ring-white/10 transition-transform group-hover:scale-105"
-          />
-          <span
-            className="font-semibold text-xl tracking-tight"
-            style={{ color: "#F8FAFC" }}
-          >
-            Synapse
-          </span>
+    <nav className="sticky top-0 z-50 bg-white border-b-4 border-black px-4 py-3">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="w-10 h-10 bg-indigo-600 border-2 border-black flex items-center justify-center rotate-[-3deg] group-hover:rotate-0 transition-transform">
+            <Brain className="text-white w-6 h-6" />
+          </div>
+          <span className="font-black text-2xl uppercase tracking-tighter">Synapse</span>
         </Link>
 
-        <div className="flex items-center gap-1">
-          {navLinks.slice(0, isAuth ? 4 : 1).map(({ href, label }) => {
-            const isActive =
-              href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`relative px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${
-                  !isActive ? "hover:bg-white/5" : ""
-                }`}
-                style={{
-                  color: isActive ? "#93C5FD" : "#94A3B8",
-                  backgroundColor: isActive ? "rgba(59, 130, 246, 0.12)" : "transparent",
-                }}
-              >
-                {isActive && (
-                  <span
-                    className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                    style={{ backgroundColor: "#3B82F6" }}
-                    aria-hidden
-                  />
-                )}
-                <span className="relative">{label}</span>
-              </Link>
-            );
-          })}
+        <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.slice(0, isAuth ? 4 : 1).map(({ href, label }) => {
+              const isActive =
+                href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`px-4 py-2 font-bold uppercase text-xs tracking-widest transition-all ${isActive
+                    ? "bg-indigo-600 text-white border-2 border-black shadow-[2px_2px_0px_0px_black] -translate-x-[2px] -translate-y-[2px]"
+                    : "hover:bg-gray-100"
+                    }`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="h-6 w-[2px] bg-black/10 mx-2 hidden md:block" />
 
           {isAuth ? (
-            <>
-              <div
-                className="w-px h-6 mx-2"
-                style={{ backgroundColor: "rgba(148, 163, 184, 0.25)" }}
-              />
-              <div className="flex items-center gap-2 pl-1">
-                <span
-                  className="text-sm max-w-[140px] truncate px-3 py-1.5 rounded-lg"
-                  style={{ color: "#94A3B8", backgroundColor: "rgba(148, 163, 184, 0.08)" }}
-                  title={state.user.email}
-                >
-                  {state.user.email}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => logout()}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all hover:opacity-90 cursor-pointer"
-                  style={{
-                    color: "#94A3B8",
-                    backgroundColor: "rgba(148, 163, 184, 0.08)",
-                  }}
-                  title="Log out"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Log out
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div
-                className="w-px h-6 mx-1"
-                style={{ backgroundColor: "rgba(148, 163, 184, 0.25)" }}
-              />
-              <Link
-                href="/login"
-                className="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:opacity-90 cursor-pointer"
-                style={{ color: "#CBD5E1" }}
+            <div className="flex items-center gap-3">
+              <span className="hidden sm:block font-bold text-[10px] uppercase tracking-tighter bg-emerald-100 border-2 border-emerald-500 px-2 py-0.5 rounded shadow-[1px_1px_0px_0px_#10B981]">
+                {state.user.email}
+              </span>
+              <button
+                onClick={() => logout()}
+                className="brut-button py-1.5 px-4 text-xs flex items-center gap-2 bg-rose-500 hover:bg-rose-600"
               >
+                <LogOut className="w-3 h-3" />
+                <span className="hidden sm:inline">Log out</span>
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Link href="/login" className="font-black uppercase text-xs hover:underline">
                 Log in
               </Link>
-              <Link
-                href="/signup"
-                className="px-5 py-2.5 rounded-xl font-semibold text-sm transition-all hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                style={{
-                  background: "linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)",
-                  color: "#FFFFFF",
-                  boxShadow: "0 4px 14px rgba(59, 130, 246, 0.4)",
-                }}
-              >
+              <Link href="/signup" className="brut-button py-2 px-5 text-xs bg-emerald-500">
                 Sign up
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>

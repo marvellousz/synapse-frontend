@@ -12,21 +12,18 @@ export default function UploadForm({
   memoryId: string;
   onUploaded: (uploads: Upload[]) => void;
 }) {
-  const [files, setFiles] = useState<FileList | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!files?.length) return;
+  async function startUpload(selectedFiles: FileList) {
+    if (!selectedFiles.length) return;
     setError(null);
     setLoading(true);
     try {
-      const list = Array.from(files);
+      const list = Array.from(selectedFiles);
       const result = await uploadFiles(memoryId, list);
       onUploaded(result);
-      setFiles(null);
       if (inputRef.current) inputRef.current.value = "";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
@@ -36,40 +33,46 @@ export default function UploadForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="glass-surface rounded-2xl p-5 border space-y-4" style={{ borderColor: "rgba(148, 163, 184, 0.2)" }}>
-      <h3 className="font-semibold" style={{ color: "#F8FAFC" }}>
-        Upload files
-      </h3>
-      <p className="text-sm" style={{ color: "#94A3B8" }}>
-        PDF, images (JPEG/PNG/GIF/WebP), videos (MP4/WebM), or text (TXT/MD/CSV/JSON).
-      </p>
+    <div className="space-y-6">
       {error && (
-        <div className="p-3 rounded-lg text-sm" style={{ background: "rgba(239, 68, 68, 0.15)", color: "#FCA5A5" }}>
+        <div className="p-4 bg-rose-50 border-2 border-rose-500 text-rose-700 font-bold text-sm shadow-[4px_4px_0px_0px_#F43F5E]">
           {error}
         </div>
       )}
-      <input
-        ref={inputRef}
-        type="file"
-        multiple
-        accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.heic,.mp4,.webm,.mov,.avi,.txt,.md,.csv,.json"
-        onChange={(e) => setFiles(e.target.files)}
-        className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#3B82F6]/20 file:text-[#3B82F6] text-slate-400"
-      />
-      {files?.length ? (
-        <p className="text-sm" style={{ color: "#94A3B8" }}>
-          {files.length} file(s) selected
-        </p>
-      ) : null}
-      <button
-        type="submit"
-        disabled={loading || !files?.length}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all hover:opacity-90 disabled:opacity-50"
-        style={{ background: "#3B82F6", color: "#FFFFFF" }}
-      >
-        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadIcon className="w-4 h-4" />}
-        {loading ? "Uploading…" : "Upload"}
-      </button>
-    </form>
+
+      <div className="relative group">
+        <label
+          className={`block p-10 bg-white border-4 border-black border-dashed transition-all cursor-pointer ${loading ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:border-indigo-600 hover:bg-gray-50'
+            }`}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            multiple
+            accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.heic,.mp4,.webm,.mov,.avi,.txt,.md,.csv,.json"
+            onChange={(e) => e.target.files && startUpload(e.target.files)}
+            className="sr-only"
+            disabled={loading}
+          />
+          <div className="flex flex-col items-center justify-center gap-3">
+            <UploadIcon className="w-8 h-8 text-gray-300 group-hover:text-indigo-600 transition-colors" />
+            <p className="font-black uppercase text-[10px] tracking-widest text-gray-400 group-hover:text-black transition-colors">
+              DRAG & DROP OR CLICK TO SYNC DATA
+            </p>
+          </div>
+        </label>
+
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/10 backdrop-blur-sm border-4 border-indigo-600">
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+              <span className="font-black uppercase text-[10px] tracking-widest text-indigo-600 animate-pulse">
+                Syncing Data Stream...
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

@@ -12,6 +12,8 @@ import {
   Globe,
   Youtube,
   ChevronUp,
+  ChevronDown,
+  Calendar,
   Zap,
   Brain,
 } from "lucide-react";
@@ -56,9 +58,9 @@ export default function SemanticSearch({ onMemorySelect }: SearchTabProps) {
   const [searchExecuted, setSearchExecuted] = useState(false);
 
   const searchTypeOptions = [
-    { value: "hybrid" as const, label: "Hybrid (Semantic + Keywords)", icon: <Zap className="w-4 h-4 text-amber-400" /> },
-    { value: "semantic" as const, label: "Semantic (Meaning-based)", icon: <Brain className="w-4 h-4 text-pink-400" /> },
-    { value: "keyword" as const, label: "Keyword (Exact matches)", icon: <Search className="w-4 h-4 text-slate-400" /> },
+    { value: "hybrid" as const, label: "Hybrid (Semantic + Keywords)", icon: <Zap className="w-4 h-4 text-amber-500" /> },
+    { value: "semantic" as const, label: "Semantic (Meaning-based)", icon: <Brain className="w-4 h-4 text-pink-500" /> },
+    { value: "keyword" as const, label: "Keyword (Exact matches)", icon: <Search className="w-4 h-4 text-slate-500" /> },
   ];
 
   const contentTypeOptions = [
@@ -74,19 +76,19 @@ export default function SemanticSearch({ onMemorySelect }: SearchTabProps) {
   const getContentIcon = (type: string) => {
     switch (type) {
       case "pdf":
-        return <FileText className="w-4 h-4" />;
+        return <FileText className="w-5 h-5" />;
       case "image":
-        return <ImageIcon className="w-4 h-4" />;
+        return <ImageIcon className="w-5 h-5" />;
       case "video":
-        return <Video className="w-4 h-4" />;
+        return <Video className="w-5 h-5" />;
       case "text":
-        return <FileCode className="w-4 h-4" />;
+        return <FileCode className="w-5 h-5" />;
       case "webpage":
-        return <Globe className="w-4 h-4" />;
+        return <Globe className="w-5 h-5" />;
       case "youtube":
-        return <Youtube className="w-4 h-4" />;
+        return <Youtube className="w-5 h-5" />;
       default:
-        return <FileText className="w-4 h-4" />;
+        return <FileText className="w-5 h-5" />;
     }
   };
 
@@ -112,7 +114,6 @@ export default function SemanticSearch({ onMemorySelect }: SearchTabProps) {
             contentType: contentType || undefined,
           });
         } else {
-          // hybrid
           apiResults = await searchAPI.hybrid(q, {
             limit: 10,
             contentType: contentType || undefined,
@@ -149,266 +150,208 @@ export default function SemanticSearch({ onMemorySelect }: SearchTabProps) {
 
   const formatDate = (dateStr: string) => {
     try {
-      return new Date(dateStr).toLocaleDateString();
+      return new Date(dateStr).toLocaleDateString(undefined, { dateStyle: 'medium' });
     } catch {
       return dateStr;
     }
   };
 
   const getSimilarityColor = (similarity: number) => {
-    if (similarity >= 0.8) return "text-green-400";
-    if (similarity >= 0.6) return "text-blue-400";
-    return "text-yellow-400";
+    if (similarity >= 0.8) return "text-emerald-600";
+    if (similarity >= 0.6) return "text-indigo-600";
+    return "text-amber-600";
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       {/* Search Form */}
-      <div className="space-y-4">
-        <form onSubmit={handleSearch} className="space-y-4">
-          {/* Query Input */}
-          <div className="relative">
+      <div className="space-y-6">
+        <form onSubmit={handleSearch} className="space-y-8">
+          <div className="flex bg-white border-4 border-black shadow-[8px_8px_0px_0px_black] focus-within:shadow-[4px_4px_0px_0px_black] focus-within:translate-x-[2px] focus-within:translate-y-[2px] transition-all">
+            <div className="flex items-center justify-center pl-6 pr-2 text-black">
+              <Search className="w-6 h-6" />
+            </div>
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Ask anything... 'Find notes about ML', 'Quote from my handwritten note', etc."
-              className="w-full px-4 py-3 pl-12 rounded-lg bg-slate-900 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
+              placeholder="Ask anything... 'Find notes about ML', 'Quote from my handwritten note'"
+              className="flex-1 px-4 py-6 text-lg md:text-xl bg-transparent outline-none font-bold placeholder:text-gray-400 placeholder:font-normal tracking-tight"
             />
-            <Search className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+            <button
+              type="submit"
+              disabled={loading || !query.trim()}
+              className="px-6 md:px-10 bg-indigo-600 text-white font-black uppercase tracking-widest border-l-4 border-black hover:bg-indigo-700 disabled:bg-gray-200 disabled:text-gray-400 transition-colors flex items-center justify-center min-w-[120px]"
+            >
+              {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : "SEARCH"}
+            </button>
           </div>
 
-          {/* Controls Row */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            {/* Search Type */}
+          <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
+              <label className="block font-black uppercase text-[10px] mb-2 tracking-widest text-gray-500">Method</label>
               <Dropdown
-                label="Search Type"
                 value={searchType}
                 options={searchTypeOptions}
-                onChange={(v) => setSearchType(v)}
+                onChange={(v) => v && setSearchType(v as "hybrid" | "semantic" | "keyword")}
                 placeholder="Search type"
               />
             </div>
 
-            {/* Content Type Filter */}
             <div className="flex-1">
+              <label className="block font-black uppercase text-[10px] mb-2 tracking-widest text-gray-500">Resource Type</label>
               <Dropdown
-                label="Filter by Type"
                 value={contentType}
                 options={contentTypeOptions}
                 onChange={setContentType}
                 placeholder="All Types"
               />
             </div>
-
-            {/* Search Button */}
-            <div className="flex items-end">
-              <button
-                type="submit"
-                disabled={loading || !query.trim()}
-                className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-medium transition-colors flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Searching...
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-4 h-4" />
-                    Search
-                  </>
-                )}
-              </button>
-            </div>
           </div>
         </form>
 
-        {/* Info Text */}
-        <p className="text-sm text-slate-400">
-          {searchType === "semantic" &&
-            "💡 Finds content by meaning. Try: 'notes about productivity'"}
-          {searchType === "keyword" &&
-            "💡 Finds exact word matches. Try: 'machine learning'"}
-          {searchType === "hybrid" &&
-            "💡 Combines semantic and keyword search. Best for general queries."}
+        <p className="font-bold text-sm text-gray-400 uppercase tracking-wide">
+          <span className="text-indigo-600 mr-2">PRO TIP:</span>
+          {searchType === "semantic" && "Synapse understands your question instead of matching keywords."}
+          {searchType === "keyword" && "Useful for finding specific terms or unique IDs."}
+          {searchType === "hybrid" && "The best of both worlds. Highly recommended."}
         </p>
       </div>
 
-      {/* Error Message */}
       {error && (
-        <div className="p-4 rounded-lg bg-red-900/30 border border-red-700 flex gap-3">
-          <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+        <div className="p-6 bg-rose-50 border-4 border-rose-500 flex gap-4 shadow-[8px_8px_0px_0px_#F43F5E]">
+          <AlertCircle className="w-6 h-6 text-rose-500 shrink-0" />
           <div>
-            <p className="font-medium text-red-300">Search Error</p>
-            <p className="text-sm text-red-200 mt-1">{error}</p>
+            <p className="font-black uppercase text-sm text-rose-700">Search Error</p>
+            <p className="font-bold text-rose-600 mt-1">{error}</p>
           </div>
         </div>
       )}
 
       {/* Results */}
       {searchExecuted && !loading && results.length === 0 && !error && (
-        <div className="text-center py-12">
-          <Search className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-          <p className="text-slate-400">No results found for "{query}"</p>
-          <p className="text-sm text-slate-500 mt-2">
-            Try different keywords or search type
+        <div className="brut-card p-16 bg-white text-center">
+          <Search className="w-16 h-16 text-gray-300 mx-auto mb-6" />
+          <h3 className="heading-brut text-2xl mb-2">No results found.</h3>
+          <p className="font-bold text-gray-400 uppercase text-xs tracking-widest">
+            Try adjusting your search query or search type.
           </p>
         </div>
       )}
 
       {/* Results List */}
       {results.length > 0 && (
-        <div className="space-y-4">
-          <p className="text-sm text-slate-400">
-            Found {results.length} result{results.length !== 1 ? "s" : ""}
-          </p>
+        <div className="space-y-6">
+          <div className="flex justify-between items-center border-b-4 border-black pb-4">
+            <h3 className="font-black text-2xl uppercase italic">Results ({results.length})</h3>
+            <div className="brut-badge bg-black text-white px-3 py-1 text-xs">AI Powered</div>
+          </div>
 
-          {results.map((result) => {
-            const isExpanded = expandedResults.has(result.memoryId);
-            const bestScore = Math.max(
-              result.semanticScore || 0,
-              result.combinedScore || 0
-            );
+          <div className="grid gap-6">
+            {results.map((result) => {
+              const isExpanded = expandedResults.has(result.memoryId);
+              const bestScore = Math.max(
+                result.semanticScore || 0,
+                result.combinedScore || 0
+              );
 
-            return (
-              <div
-                key={result.memoryId}
-                className="rounded-lg border border-slate-700 bg-slate-900 overflow-hidden hover:border-slate-600 transition-colors"
-              >
-                {/* Result Header */}
-                <button
-                  onClick={() => toggleExpanded(result.memoryId)}
-                  className="w-full p-4 text-left hover:bg-slate-800 transition-colors flex items-start gap-3"
+              return (
+                <div
+                  key={result.memoryId}
+                  className="brut-card bg-white overflow-hidden group hover:-translate-y-1 transition-all"
                 >
-                  {/* Icon */}
-                  <div className="text-slate-500 mt-1">
-                    {getContentIcon(result.contentType)}
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-2 mb-1">
-                      <h3 className="font-semibold text-white truncate">
-                        {result.title}
-                      </h3>
-                      <span className="text-xs text-slate-500 whitespace-nowrap">
-                        {result.contentType}
-                      </span>
+                  <button
+                    onClick={() => toggleExpanded(result.memoryId)}
+                    className="w-full p-6 text-left flex items-start gap-4"
+                  >
+                    <div className="w-12 h-12 bg-white border-2 border-black flex items-center justify-center rotate-[-3deg] group-hover:rotate-0 transition-transform shadow-[4px_4px_0px_0px_black]">
+                      {getContentIcon(result.contentType)}
                     </div>
 
-                    {/* Summary */}
-                    <p className="text-sm text-slate-400 line-clamp-2 mb-2">
-                      {result.summary || "No summary available"}
-                    </p>
-
-                    {/* Metadata */}
-                    <div className="flex flex-wrap gap-3 text-xs text-slate-500">
-                      <span>{formatDate(result.createdAt)}</span>
-                      {result.sourceUrl && (
-                        <span className="text-blue-400 truncate">
-                          {result.sourceUrl}
-                        </span>
-                      )}
-                      {bestScore > 0 && (
-                        <span className={`font-medium ${getSimilarityColor(bestScore)}`}>
-                          Match: {(bestScore * 100).toFixed(0)}%
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Expand Icon */}
-                  <div className="text-slate-500 shrink-0">
-                    {isExpanded ? (
-                      <ChevronUp className="w-5 h-5" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5" />
-                    )}
-                  </div>
-                </button>
-
-                {/* Expanded Details */}
-                {isExpanded && (
-                  <div className="border-t border-slate-700 p-4 bg-slate-800/50 space-y-3">
-                    {/* Matching Chunks */}
-                    {result.matches && result.matches.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-semibold text-slate-300 mb-2">
-                          Matching Passages:
-                        </h4>
-                        <div className="space-y-2 max-h-48 overflow-y-auto">
-                          {result.matches.slice(0, 3).map((match, idx) => (
-                            <div
-                              key={idx}
-                              className="p-3 rounded bg-slate-900 border border-slate-700"
-                            >
-                              <div className="flex items-start gap-2 mb-2">
-                                <span className="text-xs text-slate-500">
-                                  Chunk {match.chunkIndex + 1}
-                                </span>
-                                <span
-                                  className={`text-xs font-medium ${getSimilarityColor(match.similarity)}`}
-                                >
-                                  {(match.similarity * 100).toFixed(0)}% match
-                                </span>
-                              </div>
-                              <p className="text-sm text-slate-300 line-clamp-3">
-                                "{match.chunk}"
-                              </p>
-                            </div>
-                          ))}
-                        </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-black text-xl group-hover:text-indigo-600 transition-colors uppercase truncate">
+                          {result.title}
+                        </h3>
+                        {bestScore > 0 && (
+                          <div className={`brut-badge py-0.5 px-2 text-[10px] font-black border-2 border-black ${getSimilarityColor(bestScore)} bg-white`}>
+                            {(bestScore * 100).toFixed(0)}% MATCH
+                          </div>
+                        )}
                       </div>
-                    )}
 
-                    {/* Score Details */}
-                    {(result.semanticScore !== undefined ||
-                      result.keywordScore !== undefined) && (
-                      <div className="pt-2 border-t border-slate-700">
-                        <p className="text-xs text-slate-500 mb-2">Scores:</p>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
+                      <p className="font-bold text-sm text-gray-500 line-clamp-2 leading-snug mb-4">
+                        {result.summary || "No summary available"}
+                      </p>
+
+                      <div className="flex flex-wrap gap-4 text-[10px] font-black uppercase text-gray-400">
+                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {formatDate(result.createdAt)}</span>
+                        <span className="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 border border-black shadow-[1px_1px_0px_0px_black]">{result.contentType}</span>
+                        {result.sourceUrl && <span className="text-indigo-600 truncate underline">{result.sourceUrl}</span>}
+                      </div>
+                    </div>
+
+                    <div className="bg-white border-2 border-black p-1 self-center">
+                      {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </div>
+                  </button>
+
+                  {isExpanded && (
+                    <div className="border-t-4 border-black p-6 bg-indigo-50 space-y-6 animate-in slide-in-from-top-2 duration-200">
+                      {result.matches && result.matches.length > 0 && (
+                        <div>
+                          <h4 className="font-black text-xs uppercase tracking-widest text-indigo-900 mb-4 border-b-2 border-indigo-200 pb-2">
+                            Matching Passages
+                          </h4>
+                          <div className="grid gap-3">
+                            {result.matches.slice(0, 3).map((match, idx) => (
+                              <div
+                                key={idx}
+                                className="p-4 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]"
+                              >
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className={`font-black text-[10px] uppercase ${getSimilarityColor(match.similarity)}`}>
+                                    {(match.similarity * 100).toFixed(0)}% Precise Match
+                                  </span>
+                                </div>
+                                <p className="font-bold text-sm text-gray-700 italic">
+                                  "{match.chunk}"
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex flex-col sm:flex-row gap-4 items-center">
+                        <button
+                          onClick={() => onMemorySelect?.(result.memoryId)}
+                          className="w-full sm:flex-1 brut-button py-3 bg-indigo-600 text-sm"
+                        >
+                          OPEN MEMORY
+                        </button>
+
+                        <div className="flex gap-4">
                           {result.semanticScore !== undefined && (
-                            <div className="flex justify-between">
-                              <span className="text-slate-400">Semantic:</span>
-                              <span className="text-blue-400 font-medium">
-                                {(result.semanticScore * 100).toFixed(0)}%
-                              </span>
+                            <div className="text-center">
+                              <p className="text-[10px] font-black text-gray-400 uppercase mb-1">Semantic</p>
+                              <p className="font-black text-indigo-600">{(result.semanticScore * 100).toFixed(0)}%</p>
                             </div>
                           )}
                           {result.keywordScore !== undefined && (
-                            <div className="flex justify-between">
-                              <span className="text-slate-400">Keyword:</span>
-                              <span className="text-purple-400 font-medium">
-                                {(result.keywordScore * 100).toFixed(0)}%
-                              </span>
-                            </div>
-                          )}
-                          {result.combinedScore !== undefined && (
-                            <div className="flex justify-between col-span-2 pt-2 border-t border-slate-700">
-                              <span className="text-slate-400">Combined:</span>
-                              <span className="text-green-400 font-medium">
-                                {(result.combinedScore * 100).toFixed(0)}%
-                              </span>
+                            <div className="text-center">
+                              <p className="text-[10px] font-black text-gray-400 uppercase mb-1">Keyword</p>
+                              <p className="font-black text-emerald-600">{(result.keywordScore * 100).toFixed(0)}%</p>
                             </div>
                           )}
                         </div>
                       </div>
-                    )}
-
-                    {/* View Button */}
-                    <button
-                      onClick={() => onMemorySelect?.(result.memoryId)}
-                      className="mt-3 w-full px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors"
-                    >
-                      View Memory
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

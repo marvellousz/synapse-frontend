@@ -15,7 +15,7 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import MemoryForm from "@/components/MemoryForm";
 import UploadForm from "@/components/UploadForm";
 import UploadList from "@/components/UploadList";
-import { ArrowLeft, Loader2, Trash2, Edit2, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Loader2, Trash2, Edit2, RefreshCw, ChevronDown, ChevronUp, Sparkles, FileText } from "lucide-react";
 
 export default function MemoryDetailPage() {
   const params = useParams();
@@ -91,75 +91,78 @@ export default function MemoryDetailPage() {
 
   if (loading && !memory) {
     return (
-      <div className="flex items-center justify-center py-16" style={{ color: "#94A3B8" }}>
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
+        <p className="font-black uppercase text-xs tracking-[0.2em] text-gray-400">Loading brain memory...</p>
       </div>
     );
   }
 
   if (error || !memory) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <Link
           href="/memories"
-          className="inline-flex items-center gap-2 text-sm"
-          style={{ color: "#94A3B8" }}
+          className="inline-flex items-center gap-2 font-black uppercase text-[10px] tracking-widest text-gray-500 hover:text-black transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to memories
         </Link>
-        <div
-          className="p-4 rounded-xl border"
-          style={{
-            background: "rgba(239, 68, 68, 0.1)",
-            borderColor: "rgba(239, 68, 68, 0.3)",
-            color: "#FCA5A5",
-          }}
-        >
-          {error ?? "Memory not found"}
+        <div className="brut-card p-6 bg-rose-50 border-rose-500 shadow-[8px_8px_0px_0px_#F43F5E] text-rose-700">
+          <p className="font-black uppercase text-xs mb-1">Retrieval Failed</p>
+          <p className="font-bold">{error ?? "Memory not found"}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <Link
-          href="/memories"
-          className="inline-flex items-center gap-2 text-sm transition-colors hover:text-white"
-          style={{ color: "#94A3B8" }}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to memories
-        </Link>
-        <div className="flex items-center gap-2">
+    <div className="space-y-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-4">
+          <Link
+            href="/memories"
+            className="inline-flex items-center gap-2 font-black uppercase text-[10px] tracking-widest text-gray-400 hover:text-black transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to memories
+          </Link>
+          <div className="flex flex-wrap items-center gap-4">
+            <h1 className="heading-brut text-4xl md:text-5xl">
+              {memory.title || "Untitled memory"}
+            </h1>
+            <div className={`brut-badge text-[10px] px-3 py-1 ${memory.status === "ready" ? "bg-emerald-100 text-emerald-700 border-emerald-500" :
+              memory.status === "failed" ? "bg-rose-100 text-rose-700 border-rose-500" :
+                "bg-amber-100 text-amber-700 border-amber-500"
+              }`}>
+              {memory.status}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setEditing(!editing)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-colors hover:bg-white/5"
-            style={{ borderColor: "rgba(148, 163, 184, 0.3)", color: "#CBD5E1" }}
+            className={`brut-button px-6 py-2.5 text-xs ${editing ? "bg-rose-500" : "bg-white text-black"}`}
           >
-            <Edit2 className="w-4 h-4" />
-            {editing ? "Cancel" : "Edit"}
+            {editing ? <RefreshCw className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
+            {editing ? "CANCEL" : "EDIT"}
           </button>
           <button
             type="button"
             onClick={handleDeleteClick}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors hover:bg-red-500/20"
-            style={{ color: "#F87171" }}
+            className="brut-button px-6 py-2.5 text-xs bg-rose-500"
           >
             <Trash2 className="w-4 h-4" />
-            Delete
+            DELETE
           </button>
         </div>
       </div>
 
       {editing ? (
-        <div className="max-w-xl">
-          <h2 className="instrument-serif text-xl font-semibold mb-4" style={{ color: "#F8FAFC" }}>
-            Edit memory
-          </h2>
+        <div className="brut-card p-8 bg-white max-w-2xl">
+          <h2 className="heading-brut text-2xl mb-6">Modify Brain State.</h2>
           <MemoryForm
             mode="edit"
             initial={memory}
@@ -168,178 +171,152 @@ export default function MemoryDetailPage() {
           />
         </div>
       ) : (
-        <div
-          className="glass-surface rounded-2xl p-6 border space-y-6"
-          style={{ borderColor: "rgba(148, 163, 184, 0.2)" }}
-        >
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="instrument-serif text-2xl font-bold" style={{ color: "#F8FAFC" }}>
-              {memory.title || "Untitled memory"}
-            </h1>
-            <span
-              className="px-2.5 py-0.5 rounded-full text-xs font-medium capitalize"
-              style={{
-                background:
-                  memory.status === "ready"
-                    ? "rgba(34, 197, 94, 0.2)"
-                    : memory.status === "failed"
-                      ? "rgba(239, 68, 68, 0.2)"
-                      : "rgba(148, 163, 184, 0.2)",
-                color:
-                  memory.status === "ready"
-                    ? "#86EFAC"
-                    : memory.status === "failed"
-                      ? "#FCA5A5"
-                      : "#94A3B8",
-              }}
-            >
-              {memory.status}
-            </span>
-          </div>
-          <div className="flex flex-wrap gap-3 text-sm" style={{ color: "#94A3B8" }}>
-            <span>Type: {memory.type}</span>
-            <span>Created: {new Date(memory.createdAt).toLocaleString()}</span>
-          </div>
-
-          <section>
-            <h3 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
-              Summary
-            </h3>
-            <p className="text-slate-300 leading-relaxed">
-              {memory.summary
-                ? memory.summary
-                : memory.extractedText
-                  ? `${memory.extractedText.slice(0, 300).trim()}${memory.extractedText.length > 300 ? "…" : ""}`
-                  : "No summary yet. Re-process after uploading files."}
-            </p>
-          </section>
-
-          <section>
-            <h3 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
-              Tags
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {memory.tags && memory.tags.length > 0 ? (
-                memory.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 rounded-lg text-sm"
-                    style={{
-                      background: "rgba(148, 163, 184, 0.15)",
-                      color: "#CBD5E1",
-                      border: "1px solid rgba(148, 163, 184, 0.25)",
-                    }}
-                  >
-                    {tag}
-                  </span>
-                ))
-              ) : (
-                <span className="text-sm" style={{ color: "#64748B" }}>
-                  {memory.extractedText
-                    ? "No tags yet. Ensure GEMINI_API_KEY is set in the backend and re-process for AI-generated tags."
-                    : "No tags. Upload files (PDF, image, video, or text) and re-process to generate tags from content."}
-                </span>
-              )}
+        <div className="brut-card p-0 overflow-hidden bg-white">
+          <div className="bg-indigo-600 border-b-4 border-black p-4 flex justify-between items-center">
+            <div className="flex items-center gap-4 text-white font-black uppercase text-[10px] tracking-widest">
+              <span className="bg-black/20 px-2 py-1 border border-white/20">Type: {memory.type}</span>
+              <span className="bg-black/20 px-2 py-1 border border-white/20">Saved: {new Date(memory.createdAt).toLocaleDateString()}</span>
             </div>
-          </section>
-
-          {memory.extractedText && (
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
-                Extracted content
-              </h3>
-              <div
-                className="rounded-lg p-4 text-sm leading-relaxed whitespace-pre-wrap"
-                style={{
-                  background: "rgba(15, 23, 42, 0.5)",
-                  color: "#94A3B8",
-                  border: "1px solid rgba(148, 163, 184, 0.15)",
-                  maxHeight: extractedExpanded ? "none" : "12rem",
-                  overflow: extractedExpanded ? "visible" : "hidden",
-                }}
-              >
-                {extractedExpanded
-                  ? memory.extractedText
-                  : memory.extractedText.length <= EXTRACTED_PREVIEW_LEN
-                    ? memory.extractedText
-                    : `${memory.extractedText.slice(0, EXTRACTED_PREVIEW_LEN)}…`}
-              </div>
-              {memory.extractedText.length > EXTRACTED_PREVIEW_LEN && (
-                <button
-                  type="button"
-                  onClick={() => setExtractedExpanded(!extractedExpanded)}
-                  className="mt-2 inline-flex items-center gap-1 text-sm"
-                  style={{ color: "#64748B" }}
-                >
-                  {extractedExpanded ? (
-                    <>
-                      <ChevronUp className="w-4 h-4" />
-                      Show less
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="w-4 h-4" />
-                      Show more
-                    </>
-                  )}
-                </button>
-              )}
-            </section>
-          )}
-
-          {memory.sourceUrl && (
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
-                Source
-              </h3>
+            {memory.sourceUrl && (
               <a
                 href={memory.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm underline break-all"
-                style={{ color: "#3B82F6" }}
+                className="text-indigo-100 hover:text-white transition-colors"
+                title="View original source"
               >
-                {memory.sourceUrl}
+                <Sparkles className="w-5 h-5" />
               </a>
-            </section>
-          )}
+            )}
+          </div>
 
-          <div className="pt-2 border-t" style={{ borderColor: "rgba(148, 163, 184, 0.15)" }}>
-            <button
-              type="button"
-              onClick={handleProcess}
-              disabled={processing}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-colors disabled:opacity-50"
-              style={{ borderColor: "rgba(148, 163, 184, 0.3)", color: "#94A3B8" }}
-            >
-              {processing ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <RefreshCw className="w-4 h-4" />
+          <div className="p-8 md:p-10 space-y-10">
+            <section>
+              <h3 className="font-black uppercase text-xs tracking-widest text-indigo-600 mb-4 flex items-center gap-2">
+                <div className="w-1.5 h-4 bg-indigo-600" />
+                Executive Summary
+              </h3>
+              <p className="text-xl font-bold leading-snug lg:max-w-4xl text-black">
+                {memory.summary
+                  ? memory.summary
+                  : memory.extractedText
+                    ? `${memory.extractedText.slice(0, 300).trim()}${memory.extractedText.length > 300 ? "…" : ""}`
+                    : "No summary available. Upload files and re-process."}
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-black uppercase text-xs tracking-widest text-emerald-600 mb-4 flex items-center gap-2">
+                <div className="w-1.5 h-4 bg-emerald-600" />
+                Semantic Tags
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {memory.tags && memory.tags.length > 0 ? (
+                  memory.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="brut-badge bg-white text-black text-xs font-black shadow-[2px_2px_0px_0px_black] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-transform cursor-default"
+                    >
+                      {tag}
+                    </span>
+                  ))
+                ) : (
+                  <span className="font-bold text-gray-400 uppercase text-[10px]">No tags extracted yet</span>
+                )}
+              </div>
+            </section>
+
+            {memory.extractedText && (
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-black uppercase text-xs tracking-widest text-rose-500 flex items-center gap-2">
+                    <div className="w-1.5 h-4 bg-rose-500" />
+                    Deep Content Extraction
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setExtractedExpanded(!extractedExpanded)}
+                    className="font-black uppercase text-[10px] text-indigo-600 hover:underline"
+                  >
+                    {extractedExpanded ? "COLLAPSE" : "EXPAND ALL"}
+                  </button>
+                </div>
+                <div
+                  className="p-6 bg-gray-50 border-4 border-black shadow-[4px_4px_0px_0px_black] relative"
+                  style={{
+                    maxHeight: extractedExpanded ? "none" : "15rem",
+                    overflow: "hidden",
+                  }}
+                >
+                  <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-700">
+                    {memory.extractedText}
+                  </pre>
+                  {!extractedExpanded && memory.extractedText.length > EXTRACTED_PREVIEW_LEN && (
+                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none" />
+                  )}
+                </div>
+              </section>
+            )}
+
+            <div className="pt-8 border-t-4 border-black flex flex-wrap gap-4 items-center">
+              <button
+                type="button"
+                onClick={handleProcess}
+                disabled={processing}
+                className="brut-button bg-white text-black px-6 py-2.5 text-[10px] tracking-widest"
+              >
+                {processing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-4 h-4" />
+                )}
+                {processing ? "PROCESSING BRAIN..." : "RE-PROCESS (SYNC AI STATS)"}
+              </button>
+
+              {memory.sourceUrl && (
+                <div className="flex-1 flex justify-end">
+                  <span className="font-black text-[10px] uppercase text-gray-400 mr-2">Source:</span>
+                  <a
+                    href={memory.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-black text-[10px] uppercase text-indigo-600 underline truncate max-w-xs"
+                  >
+                    {memory.sourceUrl}
+                  </a>
+                </div>
               )}
-              {processing ? "Processing…" : "Re-process (extract & summarize)"}
-            </button>
+            </div>
           </div>
         </div>
       )}
 
-      <section className="space-y-6">
-        <h2 className="instrument-serif text-xl font-semibold" style={{ color: "#F8FAFC" }}>
-          Files
-        </h2>
-        <UploadForm memoryId={id} onUploaded={() => load()} />
-        <UploadList uploads={uploads} onDeleted={() => load()} />
-      </section>
+      <div className="grid lg:grid-cols-1 gap-12">
+        <section className="space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="w-8 h-8 bg-black flex items-center justify-center rotate-[-5deg]">
+              <FileText className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="heading-brut text-3xl">Attachments.</h2>
+          </div>
+          <div className="brut-card p-8 bg-indigo-50/50">
+            <UploadForm memoryId={id} onUploaded={() => load()} />
+            <div className="mt-8">
+              <UploadList uploads={uploads} onDeleted={() => load()} />
+            </div>
+          </div>
+        </section>
+      </div>
 
       <ConfirmDialog
         open={showDeleteConfirm}
         onClose={() => !deleting && setShowDeleteConfirm(false)}
         onConfirm={handleDeleteConfirm}
-        title="Delete memory?"
-        message="This will permanently delete this memory and all its files. This cannot be undone."
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
-        loadingLabel="Deleting…"
+        title="WIPE MEMORY?"
+        message="THIS WILL PERMANENTLY PURGE THIS STATE FROM YOUR SECOND BRAIN. DATA LOSS IS ABSOLUTE."
+        confirmLabel="PURGE"
+        cancelLabel="ABORT"
+        loadingLabel="PURGING..."
         variant="danger"
         loading={deleting}
       />

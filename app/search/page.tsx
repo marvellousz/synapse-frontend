@@ -11,17 +11,13 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="space-y-8">
-      <h1
-        className="instrument-serif text-3xl font-bold"
-        style={{ color: "#F8FAFC" }}
-      >
-        Search
-      </h1>
-      <div
-        className="glass-surface rounded-2xl p-6 border"
-        style={{ borderColor: "rgba(148, 163, 184, 0.2)" }}
-      >
+    <div className="space-y-12">
+      <div>
+        <div className="brut-badge mb-2 bg-indigo-100 text-indigo-700">Deep Inquiry</div>
+        <h1 className="heading-brut text-5xl md:text-6xl">Search.</h1>
+      </div>
+
+      <div className="brut-card p-10 bg-white">
         <SemanticSearch onMemorySelect={handleMemorySelect} />
       </div>
     </div>

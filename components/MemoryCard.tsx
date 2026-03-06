@@ -2,62 +2,51 @@
 
 import Link from "next/link";
 import type { Memory } from "@/lib/types";
-import { FileText, Calendar } from "lucide-react";
+import { FileText, Calendar, ArrowRight } from "lucide-react";
 
 export default function MemoryCard({ memory }: { memory: Memory }) {
   const date = new Date(memory.createdAt).toLocaleDateString(undefined, {
     dateStyle: "medium",
   });
+
+  const statusColors = {
+    ready: "bg-emerald-500 text-white",
+    failed: "bg-rose-500 text-white",
+    processing: "bg-indigo-600 text-white"
+  };
+
   return (
-    <Link href={`/memories/${memory.id}`}>
-      <div
-        className="glass-surface p-5 rounded-2xl border transition-all hover:-translate-y-0.5 hover:shadow-xl hover:border-primary/60 cursor-pointer"
-        style={{ borderColor: "rgba(148, 163, 184, 0.2)" }}
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <h3
-              className="font-semibold truncate"
-              style={{ color: "#F8FAFC", fontSize: "1.05rem" }}
-            >
-              {memory.title || "Untitled memory"}
-            </h3>
-            <p
-              className="text-sm mt-1 line-clamp-2"
-              style={{ color: "#94A3B8" }}
-            >
-              {memory.summary || memory.extractedText?.slice(0, 120) || memory.contentHash.slice(0, 16) + "…"}
-            </p>
-            <div className="flex items-center gap-4 mt-3 text-xs" style={{ color: "#64748B" }}>
-              <span className="flex items-center gap-1">
-                <FileText className="w-3.5 h-3.5" />
-                {memory.type}
-              </span>
-              <span className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5" />
-                {date}
-              </span>
-              <span
-                className="px-2 py-0.5 rounded-full text-xs font-medium"
-                style={{
-                  background:
-                    memory.status === "ready"
-                      ? "rgba(16, 185, 129, 0.2)"
-                      : memory.status === "failed"
-                        ? "rgba(239, 68, 68, 0.2)"
-                        : "rgba(59, 130, 246, 0.2)",
-                  color:
-                    memory.status === "ready"
-                      ? "#10B981"
-                      : memory.status === "failed"
-                        ? "#EF4444"
-                        : "#3B82F6",
-                }}
-              >
-                {memory.status}
-              </span>
+    <Link href={`/memories/${memory.id}`} className="group block">
+      <div className="brut-card p-6 bg-white relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="brut-badge text-[10px] py-0.5 px-2 bg-indigo-100 flex items-center gap-1">
+              <FileText className="w-3 h-3" />
+              <span className="font-black">{memory.type}</span>
+            </div>
+            <div className={`brut-badge text-[10px] py-0.5 px-2 font-black border-2 border-black ${statusColors[memory.status as keyof typeof statusColors] || 'bg-gray-500 text-white'}`}>
+              {memory.status.toUpperCase()}
             </div>
           </div>
+
+          <h3 className="font-black text-2xl mb-2 group-hover:text-indigo-600 transition-colors uppercase truncate">
+            {memory.title || "Untitled memory"}
+          </h3>
+
+          <p className="font-bold text-gray-500 line-clamp-2 text-sm max-w-2xl leading-snug mb-4">
+            {memory.summary || memory.extractedText?.slice(0, 150) || "No summary available."}
+          </p>
+
+          <div className="flex items-center gap-4 text-xs font-black uppercase text-gray-400">
+            <div className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              {date}
+            </div>
+          </div>
+        </div>
+
+        <div className="hidden sm:flex items-center justify-center w-12 h-12 bg-white border-4 border-black group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-[4px_4px_0px_0px_black] group-hover:shadow-[0px_0px_0px_0px_black] group-hover:translate-x-[4px] group-hover:translate-y-[4px]">
+          <ArrowRight className="w-6 h-6" />
         </div>
       </div>
     </Link>

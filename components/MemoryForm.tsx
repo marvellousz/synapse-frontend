@@ -79,28 +79,36 @@ export default function MemoryForm(props: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="glass-surface rounded-2xl p-6 border space-y-4" style={{ borderColor: "rgba(148, 163, 184, 0.2)" }}>
+    <form onSubmit={handleSubmit} className="brut-card p-8 bg-white space-y-6">
+      <div className="flex items-center gap-3 mb-2 underline decoration-indigo-600 decoration-4 underline-offset-4">
+        <h3 className="heading-brut text-xl">{isCreate ? "NEW MEMORY" : "EDIT MEMORY"}</h3>
+      </div>
+
       {error && (
-        <div className="p-3 rounded-lg text-sm" style={{ background: "rgba(239, 68, 68, 0.15)", color: "#FCA5A5" }}>
+        <div className="p-4 bg-rose-50 border-2 border-rose-500 text-rose-700 font-bold text-sm shadow-[4px_4px_0px_0px_#F43F5E] animate-in slide-in-from-top-1">
           {error}
         </div>
       )}
+
       {isCreate && (
-        <Dropdown
-          label="Type"
-          value={type}
-          options={TYPE_OPTIONS}
-          onChange={(t) => {
-            setType(t as Memory["type"]);
-            if (t !== "webpage" && t !== "youtube") setSourceUrl("");
-          }}
-          placeholder="Select type"
-        />
+        <div className="space-y-1">
+          <Dropdown
+            label="Category Type"
+            value={type}
+            options={TYPE_OPTIONS}
+            onChange={(t) => {
+              setType(t as Memory["type"]);
+              if (t !== "webpage" && t !== "youtube") setSourceUrl("");
+            }}
+            placeholder="Select type"
+          />
+        </div>
       )}
+
       {showFileUpload && (
-        <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "#94A3B8" }}>
-            Upload {type} file(s)
+        <div className="space-y-4 p-6 bg-indigo-50 border-4 border-black border-dashed">
+          <label className="block font-black uppercase text-[10px] tracking-widest text-indigo-700">
+            Secure Upload: {type}
           </label>
           <input
             type="file"
@@ -113,68 +121,76 @@ export default function MemoryForm(props: Props) {
                   : ".mp4,.webm,.mov,.avi"
             }
             onChange={(e) => setFiles(e.target.files ? Array.from(e.target.files) : [])}
-            className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#3B82F6]/20 file:text-[#3B82F6] text-slate-400"
+            className="block w-full text-xs font-black uppercase text-gray-500
+              file:mr-4 file:py-2 file:px-6
+              file:border-2 file:border-black
+              file:font-black file:uppercase file:text-[10px]
+              file:bg-black file:text-white
+              hover:file:bg-gray-800 transition-colors"
           />
           {files.length > 0 && (
-            <p className="text-sm mt-1" style={{ color: "#94A3B8" }}>
-              {files.length} file(s) selected
+            <p className="font-black uppercase text-[10px] text-emerald-600">
+              {files.length} FILE(S) READY FOR CAPTURE
             </p>
           )}
         </div>
       )}
-      <div>
-        <label className="block text-sm font-medium mb-1" style={{ color: "#94A3B8" }}>Title</label>
+
+      <div className="space-y-2">
+        <label className="block font-black uppercase text-[10px] tracking-widest text-gray-500">Title of Memory</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg border bg-white/5 text-white placeholder:text-slate-500"
-          style={{ borderColor: "rgba(148, 163, 184, 0.3)" }}
-          placeholder="Optional title"
+          className="brut-input py-4 font-bold bg-gray-50 focus:bg-white"
+          placeholder="ENTER TITLE..."
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium mb-1" style={{ color: "#94A3B8" }}>Summary</label>
+
+      <div className="space-y-2">
+        <label className="block font-black uppercase text-[10px] tracking-widest text-gray-500">Subject Summary</label>
         <textarea
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
-          rows={3}
-          className="w-full px-4 py-2 rounded-lg border bg-white/5 text-white placeholder:text-slate-500 resize-none"
-          style={{ borderColor: "rgba(148, 163, 184, 0.3)" }}
-          placeholder="Optional summary"
+          rows={4}
+          className="brut-input py-4 font-bold bg-gray-50 focus:bg-white resize-none"
+          placeholder="WHAT IS THIS ABOUT?"
         />
       </div>
+
       {(type === "webpage" || type === "youtube") && (
-        <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "#94A3B8" }}>
-            {type === "youtube" ? "YouTube video URL" : "Source URL"}
+        <div className="space-y-2">
+          <label className="block font-black uppercase text-[10px] tracking-widest text-gray-500">
+            {type === "youtube" ? "YOUTUBE URL" : "EXTERNAL LINK"}
           </label>
           <input
             type="url"
             value={sourceUrl}
             onChange={(e) => setSourceUrl(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border bg-white/5 text-white placeholder:text-slate-500"
-            style={{ borderColor: "rgba(148, 163, 184, 0.3)" }}
-            placeholder={type === "youtube" ? "https://www.youtube.com/watch?v=... or https://youtu.be/..." : "https://..."}
+            className="brut-input py-4 font-bold bg-gray-50 focus:bg-white"
+            placeholder={type === "youtube" ? "https://www.youtube.com/watch?v=..." : "https://..."}
           />
         </div>
       )}
+
       {!isCreate && (
-        <Dropdown
-          label="Status"
-          value={status}
-          options={STATUS_OPTIONS}
-          onChange={(s) => setStatus(s as Memory["status"])}
-          placeholder="Select status"
-        />
+        <div className="space-y-1">
+          <Dropdown
+            label="System Status"
+            value={status}
+            options={STATUS_OPTIONS}
+            onChange={(s) => setStatus(s as Memory["status"])}
+            placeholder="Select status"
+          />
+        </div>
       )}
+
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 rounded-lg font-medium transition-all hover:opacity-90 disabled:opacity-50"
-        style={{ background: "#3B82F6", color: "#FFFFFF" }}
+        className="brut-button w-full justify-center py-4 text-sm bg-indigo-600 shadow-[6px_6px_0px_0px_black]"
       >
-        {loading ? "Saving…" : isCreate ? "Create memory" : "Save changes"}
+        {loading ? "PROCESSING..." : isCreate ? "CREATE MEMORY STATE" : "SAVE BRAIN UPDATE"}
       </button>
     </form>
   );

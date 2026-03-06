@@ -33,50 +33,45 @@ export default function UploadList({
 
   if (!uploads.length) {
     return (
-      <div
-        className="glass-surface rounded-2xl p-6 border text-center"
-        style={{ borderColor: "rgba(148, 163, 184, 0.2)", color: "#94A3B8" }}
-      >
-        No files uploaded yet. Use the form above to add PDFs, images, or videos.
+      <div className="brut-card p-8 bg-gray-50 border-gray-200 shadow-none text-center">
+        <p className="font-bold text-gray-400 uppercase text-xs tracking-widest leading-loose">
+          NO DATA STREAMS ATTACHED. <br />
+          USE THE INTERFACE ABOVE TO SYNC ASSETS.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <h3 className="font-semibold" style={{ color: "#F8FAFC" }}>
-        Files ({uploads.length})
+    <div className="space-y-4">
+      <h3 className="font-black uppercase text-[10px] tracking-widest text-gray-500 mb-4">
+        ATTACHED ASSETS ({uploads.length})
       </h3>
-      <ul className="space-y-2">
+      <ul className="grid gap-3">
         {uploads.map((u) => (
           <li
             key={u.id}
-            className="glass-surface rounded-xl p-4 border flex items-center justify-between gap-4"
-            style={{ borderColor: "rgba(148, 163, 184, 0.2)" }}
+            className="bg-white border-4 border-black p-4 flex items-center justify-between gap-4 shadow-[4px_4px_0px_0px_black] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-transform"
           >
-            <div className="flex items-center gap-3 min-w-0">
-              <div
-                className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
-                style={{ background: "rgba(59, 130, 246, 0.2)", color: "#3B82F6" }}
-              >
-                <FileText className="w-5 h-5" />
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="flex-shrink-0 w-12 h-12 bg-indigo-100 border-2 border-black flex items-center justify-center rotate-[-3deg]">
+                <FileText className="w-6 h-6 text-indigo-600" />
               </div>
               <div className="min-w-0">
-                <p className="font-medium truncate" style={{ color: "#F8FAFC" }}>
+                <p className="font-black uppercase text-xs truncate text-black">
                   {u.fileType} · {(u.fileSize / 1024).toFixed(1)} KB
                 </p>
-                <p className="text-xs truncate" style={{ color: "#64748B" }}>
-                  {u.mimeType ?? "—"}
+                <p className="font-bold text-[10px] uppercase text-gray-400 truncate">
+                  {u.mimeType ?? "UNKNOWN TYPE"}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-3 flex-shrink-0">
               <a
                 href={fileUrlHref(u.fileUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-                style={{ color: "#94A3B8" }}
+                className="brut-button p-2.5 bg-white text-black text-xs shadow-[2px_2px_0px_0px_black]"
                 title="Open file"
               >
                 <ExternalLink className="w-4 h-4" />
@@ -85,8 +80,7 @@ export default function UploadList({
                 type="button"
                 onClick={() => handleDelete(u.id)}
                 disabled={deletingId === u.id}
-                className="p-2 rounded-lg hover:bg-red-500/20 transition-colors disabled:opacity-50"
-                style={{ color: "#F87171" }}
+                className="brut-button p-2.5 bg-rose-500 text-white text-xs shadow-[2px_2px_0px_0px_black] disabled:bg-gray-200"
                 title="Delete"
               >
                 {deletingId === u.id ? (

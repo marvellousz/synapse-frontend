@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import PixelBlast from "@/components/PixelBlast";
 import { useAuth } from "@/contexts/AuthContext";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Brain } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,101 +39,77 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative">
-      <div
-        className="fixed inset-0 -z-10"
-        style={{ width: "100vw", height: "100vh", backgroundColor: "#0F172A" }}
-        aria-hidden="true"
-      >
-        <div className="absolute inset-0 opacity-40">
-          <PixelBlast
-            variant="square"
-            pixelSize={4}
-            color="#3B82F6"
-            patternScale={2}
-            patternDensity={1}
-            enableRipples
-            rippleSpeed={0.35}
-            rippleThickness={0.12}
-            rippleIntensityScale={1.2}
-            liquid={false}
-            speed={0.45}
-            edgeFade={0.35}
-            transparent={true}
-          />
+    <div className="min-h-screen grid-bg py-16 px-6">
+      <div className="max-w-md mx-auto">
+        <div className="mb-12 flex flex-col items-center">
+          <Link href="/" className="mb-8 p-3 bg-white border-2 border-black shadow-[4px_4px_0px_0px_black] rotate-[-5deg] hover:rotate-0 transition-transform inline-block">
+            <Brain className="w-8 h-8 text-indigo-600" />
+          </Link>
+          <h1 className="heading-brut text-4xl mb-2 text-center">Welcome Back.</h1>
+          <p className="font-bold text-gray-500 uppercase text-xs tracking-widest">Access your second brain</p>
         </div>
-      </div>
-      <div className="max-w-md mx-auto px-6 py-16">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm mb-8 transition-colors hover:text-white"
-          style={{ color: "#94A3B8" }}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to home
-        </Link>
-        <h1 className="instrument-serif text-3xl font-bold mb-2" style={{ color: "#F8FAFC" }}>
-          Log in
-        </h1>
-        <p className="text-slate-400 mb-8">Access your memories</p>
-        <form
-          onSubmit={handleSubmit}
-          className="glass-surface rounded-2xl p-6 border space-y-4"
-          style={{ borderColor: "rgba(148, 163, 184, 0.2)" }}
-        >
-          {error && (
-            <div
-              className="p-3 rounded-lg text-sm"
-              style={{ background: "rgba(239, 68, 68, 0.15)", color: "#FCA5A5" }}
-            >
-              {error}
+
+        <div className="brut-card p-8 bg-white relative">
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-4 bg-rose-100 border-2 border-rose-500 text-rose-700 font-bold text-sm shadow-[4px_4px_0px_0px_#F43F5E]">
+                {error}
+              </div>
+            )}
+
+            <div>
+              <label className="block font-black uppercase text-xs mb-2 tracking-widest text-gray-600">
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="brut-input"
+                placeholder="you@example.com"
+              />
             </div>
-          )}
-          <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "#94A3B8" }}>
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              className="w-full px-4 py-2 rounded-lg border bg-white/5 text-white placeholder:text-slate-500"
-              style={{ borderColor: "rgba(148, 163, 184, 0.3)" }}
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "#94A3B8" }}>
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              className="w-full px-4 py-2 rounded-lg border bg-white/5 text-white placeholder:text-slate-500"
-              style={{ borderColor: "rgba(148, 163, 184, 0.3)" }}
-              placeholder="••••••••"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-lg font-medium transition-all hover:opacity-90 disabled:opacity-50"
-            style={{ background: "#3B82F6", color: "#FFFFFF" }}
-          >
-            {loading ? "Logging in…" : "Log in"}
-          </button>
-          <p className="text-center text-sm" style={{ color: "#94A3B8" }}>
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="underline" style={{ color: "#3B82F6" }}>
-              Sign up
-            </Link>
-          </p>
-        </form>
+
+            <div>
+              <label className="block font-black uppercase text-xs mb-2 tracking-widest text-gray-600">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="brut-input"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="brut-button w-full justify-center text-xl py-4 mt-4"
+            >
+              {loading ? "AUTHENTICATING..." : "LOG IN"}
+            </button>
+
+            <div className="text-center pt-4">
+              <p className="font-bold text-sm text-gray-500">
+                NEW HERE?{" "}
+                <Link href="/signup" className="text-indigo-600 underline decoration-2 underline-offset-4 hover:bg-indigo-50">
+                  CREATE AN ACCOUNT
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link href="/" className="font-black uppercase text-sm flex items-center justify-center gap-2 hover:underline">
+            <ArrowLeft className="w-4 h-4" /> Back to Home
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -19,18 +19,15 @@ export default function NewMemoryPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <Link
         href="/memories"
-        className="inline-flex items-center gap-2 text-sm transition-colors hover:text-white"
-        style={{ color: "#94A3B8" }}
+        className="inline-flex items-center gap-2 font-black uppercase text-[10px] tracking-widest text-gray-500 hover:text-black transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back to memories
+        Back to archive
       </Link>
-      <h1 className="instrument-serif text-3xl font-bold" style={{ color: "#F8FAFC" }}>
-        New memory
-      </h1>
+      <h1 className="heading-brut text-4xl md:text-5xl">Capture State.</h1>
       <div className="max-w-xl">
         <MemoryForm mode="create" onSubmit={handleCreate} />
       </div>

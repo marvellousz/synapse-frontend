@@ -21,8 +21,8 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Synapse - Note-taking for Power Users",
-  description: "The ultimate note-taking platform for researchers, power users, and knowledge seekers. Organize your thoughts with clarity and elegance.",
+  title: "Synapse - The Second Brain",
+  description: "The ultimate second brain for researchers, power users, and knowledge seekers. Organize your thoughts with clarity and elegance.",
 };
 
 export default function RootLayout({

@@ -44,12 +44,11 @@ export default function Dropdown<T extends string = string>({
   }, []);
 
   return (
-    <div ref={ref} className="relative" id={id}>
+    <div ref={ref} className="relative w-full" id={id}>
       {label && (
         <label
           htmlFor={id}
-          className="block text-sm font-medium mb-1.5"
-          style={{ color: "#94A3B8" }}
+          className="block font-black uppercase text-[10px] mb-2 tracking-widest text-gray-500"
         >
           {label}
         </label>
@@ -60,41 +59,27 @@ export default function Dropdown<T extends string = string>({
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-label={ariaLabel ?? label ?? placeholder}
-        className="w-full px-4 py-2.5 rounded-xl border text-left flex items-center justify-between gap-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 hover:border-slate-500"
-        style={{
-          backgroundColor: "rgba(15, 23, 42, 0.9)",
-          borderColor: open ? "rgba(59, 130, 246, 0.5)" : "rgba(148, 163, 184, 0.3)",
-          color: "#F8FAFC",
-        }}
+        className="w-full px-4 py-3 bg-white border-2 border-black text-left flex items-center justify-between gap-2 shadow-[4px_4px_0px_0px_black] active:shadow-[0px_0px_0px_0px_black] active:translate-x-[2px] active:translate-y-[2px] transition-all"
       >
         <span className="flex items-center gap-2 truncate">
           {selected ? (
             <>
               {selected.icon}
-              <span>{selected.label}</span>
+              <span className="font-bold text-sm uppercase">{selected.label}</span>
             </>
           ) : (
-            <span style={{ color: "#64748B" }}>{placeholder}</span>
+            <span className="font-bold text-sm uppercase text-gray-400">{placeholder}</span>
           )}
         </span>
         <ChevronDown
-          className="w-4 h-4 shrink-0 transition-transform duration-200"
-          style={{
-            color: "#94A3B8",
-            transform: open ? "rotate(180deg)" : "rotate(0deg)",
-          }}
+          className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
       {open && (
         <ul
           role="listbox"
-          className="absolute z-50 mt-2 w-full min-w-[200px] rounded-xl border py-1.5 max-h-60 overflow-auto"
-          style={{
-            backgroundColor: "rgba(15, 23, 42, 0.98)",
-            borderColor: "rgba(148, 163, 184, 0.25)",
-            boxShadow: "0 10px 40px -10px rgba(0,0,0,0.5)",
-          }}
+          className="absolute z-50 mt-4 w-full bg-white border-4 border-black py-2 shadow-[8px_8px_0px_0px_black] animate-in slide-in-from-top-2 duration-150"
         >
           {options.map((opt) => {
             const isSelected = value === opt.value;
@@ -107,30 +92,10 @@ export default function Dropdown<T extends string = string>({
                   onChange(opt.value);
                   setOpen(false);
                 }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    onChange(opt.value);
-                    setOpen(false);
-                  }
-                }}
-                className="flex items-center gap-2.5 px-3.5 py-2.5 cursor-pointer transition-colors duration-150 text-sm rounded-lg mx-1"
-                style={{
-                  color: "#F8FAFC",
-                  backgroundColor: isSelected
-                    ? "rgba(59, 130, 246, 0.25)"
-                    : "transparent",
-                }}
-                onMouseEnter={(e) => {
-                  if (!isSelected) {
-                    e.currentTarget.style.backgroundColor = "rgba(148, 163, 184, 0.1)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = isSelected
-                    ? "rgba(59, 130, 246, 0.25)"
-                    : "transparent";
-                }}
+                className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors text-sm font-bold uppercase ${isSelected
+                    ? "bg-indigo-600 text-white"
+                    : "hover:bg-indigo-50"
+                  }`}
               >
                 {opt.icon}
                 <span>{opt.label}</span>
