@@ -10,15 +10,18 @@
 :root {
   /* Synapse Neobrutalist Palette */
   --bg-color: #F8FAFC;
-  --main-color: #6366F1; /* Indigo */
-  --accent-color: #22C55E; /* Emerald */
-  --secondary-accent: #F43F5E; /* Rose */
+  --main-color: #6366F1;
+  /* Indigo */
+  --accent-color: #22C55E;
+  /* Emerald */
+  --secondary-accent: #F43F5E;
+  /* Rose */
   --border-color: #000000;
   --shadow-color: #000000;
-  
+
   --background: var(--bg-color);
   --foreground: #000000;
-  
+
   --brut-radius: 4px;
   --brut-border: 3px solid var(--border-color);
   --brut-shadow: 6px 6px 0px 0px var(--shadow-color);
@@ -116,16 +119,62 @@ body {
 
 /* Grid Background */
 .grid-bg {
-  background-image: 
-    linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
 /* Custom Highlight */
 .brut-highlight {
-  background: var(--accent-color);
+  background: var(--main-color);
+  color: white;
   box-shadow: 4px 4px 0px 0px black;
-  padding: 0 4px;
+  padding: 0 8px;
   font-weight: 800;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+/* Hide Scrollbars Global */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.text-outline {
+  -webkit-text-stroke: 1.5px black;
+  color: transparent;
+}
+
+/* Scanning Animation Utility */
+.scanline {
+  width: 100%;
+  height: 2px;
+  background: rgba(99, 102, 241, 0.2);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  animation: scan 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scan {
+  from { top: 0% }
+  to { top: 100% }
+}
+
+.brut-tag {
+  background: white;
+  border: 2px solid black;
+  padding: 2px 8px;
+  font-weight: 900;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
