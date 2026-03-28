@@ -24,6 +24,11 @@ export default function MemoryCard({ memory }: { memory: Memory }) {
               <FileText className="w-3 h-3" />
               <span className="font-black">{memory.type}</span>
             </div>
+            {memory.category && (
+               <div className="brut-badge text-[10px] py-0.5 px-2 bg-amber-100 flex items-center gap-1 border-amber-500 text-amber-900">
+                <span className="font-black">/{memory.category}</span>
+              </div>
+            )}
             <div className={`brut-badge text-[10px] py-0.5 px-2 font-black border-2 border-black ${statusColors[memory.status as keyof typeof statusColors] || 'bg-gray-500 text-white'}`}>
               {memory.status.toUpperCase()}
             </div>

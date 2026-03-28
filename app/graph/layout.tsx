@@ -6,7 +6,7 @@ import AppNav from "@/components/AppNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 
-export default function MemoriesLayout({
+export default function GraphLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -36,17 +36,10 @@ export default function MemoriesLayout({
   }
 
   return (
-    <div className="min-h-screen grid-bg relative">
+    <div className="min-h-screen grid-bg relative h-screen flex flex-col overflow-hidden">
       <AppNav />
-      <main className="max-w-5xl mx-auto px-6 py-12">
-        <Suspense fallback={
-          <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
-            <p className="font-black uppercase text-xs tracking-widest text-gray-400">Loading Directory...</p>
-          </div>
-        }>
-          {children}
-        </Suspense>
+      <main className="flex-1 overflow-hidden py-10 px-6">
+        {children}
       </main>
     </div>
   );

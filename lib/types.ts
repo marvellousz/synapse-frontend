@@ -19,6 +19,7 @@ export interface Memory {
   extractedText: string | null;
   sourceUrl: string | null;
   contentHash: string;
+  category: string | null;
   status: MemoryStatus;
   createdAt: string;
   updatedAt: string;
@@ -32,6 +33,7 @@ export interface MemoryCreate {
   summary?: string | null;
   extractedText?: string | null;
   sourceUrl?: string | null;
+  category?: string | null;
   status?: MemoryStatus;
 }
 
@@ -40,6 +42,7 @@ export interface MemoryUpdate {
   summary?: string | null;
   extractedText?: string | null;
   sourceUrl?: string | null;
+  category?: string | null;
   status?: MemoryStatus;
 }
 

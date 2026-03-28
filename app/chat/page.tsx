@@ -225,7 +225,6 @@ export default function ChatPage() {
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <div className="brut-badge mb-1 bg-indigo-100 text-indigo-700">AI Assistant</div>
           <h1 className="heading-brut text-4xl">Chat.</h1>
         </div>
         {!sidebarOpen && (

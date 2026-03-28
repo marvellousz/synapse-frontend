@@ -59,13 +59,23 @@ export async function listMemories(params?: {
   status?: string;
   skip?: number;
   take?: number;
+  category?: string;
 }): Promise<Memory[]> {
   const search: Record<string, string> = {};
   if (params?.type) search.type = params.type;
   if (params?.status) search.status = params.status;
   if (params?.skip != null) search.skip = String(params.skip);
   if (params?.take != null) search.take = String(params.take);
+  if (params?.category) search.category = params.category;
   return api<Memory[]>("/memories", { params: search });
+}
+
+export async function getMemoryGraph(): Promise<{ nodes: any[]; links: any[] }> {
+  return api<{ nodes: any[]; links: any[] }>("/memories/graph");
+}
+
+export async function getMemoryCategories(): Promise<{ category: string; count: number }[]> {
+  return api<{ category: string; count: number }[]>("/memories/categories");
 }
 
 export async function getMemory(id: string): Promise<Memory> {

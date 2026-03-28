@@ -8,6 +8,8 @@ import { LogOut, Brain } from "lucide-react";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/memories", label: "Memories" },
+  { href: "/folders", label: "Folders" },
+  { href: "/graph", label: "Graph" },
   { href: "/search", label: "Search" },
   { href: "/chat", label: "Chat" },
 ] as const;
@@ -29,7 +31,7 @@ export default function AppNav() {
 
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center gap-1">
-            {navLinks.slice(0, isAuth ? 4 : 1).map(({ href, label }) => {
+            {navLinks.slice(0, isAuth ? 6 : 1).map(({ href, label }) => {
               const isActive =
                 href === "/"
                   ? pathname === "/"
