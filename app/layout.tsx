@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
-// @ts-expect-error CSS import
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 

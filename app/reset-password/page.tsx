@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft, Brain } from "lucide-react";
@@ -9,6 +9,14 @@ import { resetPassword } from "@/lib/api";
 import ToastMessage from "@/components/ToastMessage";
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<ResetPasswordFallback />}>
+      <ResetPasswordContent />
+    </Suspense>
+  );
+}
+
+function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const token = useMemo(() => searchParams.get("token") ?? "", [searchParams]);
 
@@ -126,6 +134,18 @@ export default function ResetPasswordPage() {
           <Link href="/" className="font-black uppercase text-sm flex items-center justify-center gap-2 hover:underline">
             <ArrowLeft className="w-4 h-4" /> Back to Home
           </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ResetPasswordFallback() {
+  return (
+    <div className="min-h-screen grid-bg py-16 px-6">
+      <div className="max-w-md mx-auto">
+        <div className="brut-card p-8 bg-white relative">
+          <p className="font-black uppercase text-xs tracking-widest text-gray-500 text-center">loading reset page...</p>
         </div>
       </div>
     </div>
