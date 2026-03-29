@@ -62,10 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = useCallback(
     async (email: string, password: string, name?: string | null) => {
       await apiSignup({ email, password, name });
-      const { access_token } = await apiLogin(email, password);
-      setAuthToken(access_token);
-      const user = await getMe();
-      setState({ status: "authenticated", user });
+      setState({ status: "unauthenticated" });
     },
     []
   );

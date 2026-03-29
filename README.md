@@ -3,6 +3,7 @@
 this is the web app for synapse (next.js).
 
 main features: memories, folders, graph, semantic search, and chat.
+auth includes email verification + forgot/reset password flows.
 
 ## quick start
 
