@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getMemoryCategories } from "@/lib/api";
-import { Loader2, Folder, ArrowRight, Layers, LayoutGrid, Info, Search } from "lucide-react";
+import { Loader2, Folder, ArrowRight, Info } from "lucide-react";
 import { motion } from "motion/react";
 
 interface CategorySummary {
@@ -84,30 +84,25 @@ export default function FoldersPage() {
               transition={{ delay: i * 0.05, type: "spring", stiffness: 200 }}
             >
               <Link href={`/memories?category=${encodeURIComponent(cat.category)}`} className="group block">
-                <div className="relative">
-                  <div className="brut-card bg-white p-0 relative h-72 flex flex-col group-hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all">
-                    {/* Clean body with no image preview */}
-                    <div className="flex-1 relative bg-gray-50 overflow-hidden border-b-4 border-black">
-                      <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none">
-                        <Folder className="w-48 h-48" />
+                <div className="brut-card bg-white p-5 relative overflow-hidden group-hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all">
+                  <div className={`absolute left-0 top-0 bottom-0 w-2 ${getCategoryColor(cat.category)} border-r-2 border-black`} />
+
+                  <div className="pl-4 pr-2 space-y-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-12 h-12 border-[3px] border-black bg-gray-50 flex items-center justify-center shrink-0">
+                        <Folder className="w-6 h-6 text-gray-500" />
                       </div>
+                      <h3 className="heading-brut text-3xl leading-none uppercase tracking-tighter truncate">
+                        {cat.category}
+                      </h3>
                     </div>
 
-                    {/* Folder Footer Info */}
-                    <div className="p-5 bg-white flex flex-col gap-1 relative overflow-hidden">
-                       <div className={`absolute left-0 top-0 bottom-0 w-2 ${getCategoryColor(cat.category)} border-r-2 border-black`} />
-                       <div className="flex items-center justify-between gap-6 pl-3 pr-2">
-                        <div className="min-w-0">
-                          <h3 className="heading-brut text-2xl leading-none uppercase tracking-tighter">{cat.category}</h3>
-                        </div>
-                        <div className="flex items-center gap-4 shrink-0">
-                          <div className="bg-white border-[3px] border-black px-3 py-1 font-black text-[10px] tracking-widest uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                            {cat.count} FILES
-                          </div>
-                          <div className="w-11 h-11 border-[3px] border-black flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all ml-1">
-                            <ArrowRight className="w-5 h-5" />
-                          </div>
-                        </div>
+                    <div className="flex items-center justify-between gap-4 flex-wrap">
+                      <div className="bg-white border-[3px] border-black px-3 py-1 font-black text-[10px] tracking-widest uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        {cat.count} FILES
+                      </div>
+                      <div className="w-11 h-11 border-[3px] border-black flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all shrink-0">
+                        <ArrowRight className="w-5 h-5" />
                       </div>
                     </div>
                   </div>
