@@ -23,9 +23,9 @@ export const metadata: Metadata = {
   title: "Synapse - The Second Brain",
   description: "The ultimate second brain for researchers, power users, and knowledge seekers. Organize your thoughts with clarity and elegance.",
   icons: {
-    icon: "/synapse.png",
-    shortcut: "/synapse.png",
-    apple: "/synapse.png",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 
