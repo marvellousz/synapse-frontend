@@ -13,7 +13,7 @@ import ToastMessage from "@/components/ToastMessage";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { state, logout } = useAuth();
+  const { state } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -86,9 +86,8 @@ export default function SettingsPage() {
     setDeletingAccount(true);
     try {
       const res = await deleteAccount(deletePassword);
-      logout();
-      router.replace("/signup");
       setToastSuccess(res.message);
+      setDeletePassword("");
     } catch (err) {
       setToastError(err instanceof Error ? err.message : "could not delete account");
     } finally {
@@ -225,10 +224,10 @@ export default function SettingsPage() {
           onClose={() => setShowDeleteConfirm(false)}
           onConfirm={onDeleteAccount}
           loading={deletingAccount}
-          loadingLabel="deleting..."
+          loadingLabel="sending..."
           title="Delete Account"
-          message="This action cannot be undone. Your account and data will be permanently deleted."
-          confirmLabel="Yes, delete"
+          message="We will email you a secure confirmation link. Your account is deleted only after you click that link."
+          confirmLabel="Send delete email"
           cancelLabel="Cancel"
           variant="danger"
         />

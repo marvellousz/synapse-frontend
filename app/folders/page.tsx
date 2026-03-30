@@ -5,7 +5,6 @@ import Link from "next/link";
 import { getMemoryCategories } from "@/lib/api";
 import { Loader2, Folder, ArrowRight, Layers, LayoutGrid, Info, Search } from "lucide-react";
 import { motion } from "motion/react";
-import Image from "next/image";
 
 interface CategorySummary {
   category: string;
@@ -23,16 +22,6 @@ export default function FoldersPage() {
       .catch((err) => setError(err.message || "Failed to load folders"))
       .finally(() => setLoading(false));
   }, []);
-
-  const getCategoryImage = (cat: string) => {
-    const mapping: Record<string, string> = {
-      "Work": "/category-images/work.png",
-      "Personal": "/category-images/personal.png",
-      "Technology": "/category-images/technology.png",
-      "Finance": "/category-images/finance.png",
-    };
-    return mapping[cat] || null;
-  };
 
   const getCategoryColor = (cat: string) => {
       const colors: Record<string, string> = {
@@ -95,44 +84,29 @@ export default function FoldersPage() {
               transition={{ delay: i * 0.05, type: "spring", stiffness: 200 }}
             >
               <Link href={`/memories?category=${encodeURIComponent(cat.category)}`} className="group block">
-                <div className="relative pt-8">
-                  {/* Folder Tab with category color */}
-                  <div className={`absolute top-0 left-0 w-28 h-10 ${getCategoryColor(cat.category)} border-[4px] border-black transition-all group-hover:-translate-y-2 flex items-center justify-center`}>
-                     <div className="w-20 h-1 bg-black/20" />
-                  </div>
-                  
-                  {/* Folder Body */}
-                  <div className="brut-card bg-white p-0 relative h-[18rem] flex flex-col group-hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all">
-                    {/* Category Image / Banner */}
-                    <div className="flex-1 relative bg-gray-50 overflow-hidden border-b-[4px] border-black">
-                      {getCategoryImage(cat.category) ? (
-                        <Image 
-                          src={getCategoryImage(cat.category)!} 
-                          alt={cat.category}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-700"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center opacity-[0.05]">
-                           <Folder className="w-48 h-48" />
-                        </div>
-                      )}
-                      
-                      {/* Count Badge - Neobrutalist style */}
-                      <div className="absolute top-4 right-4 bg-white border-[3px] border-black px-3 py-1 font-black text-[10px] tracking-widest uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                        {cat.count} FILES
+                <div className="relative">
+                  <div className="brut-card bg-white p-0 relative h-72 flex flex-col group-hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all">
+                    {/* Clean body with no image preview */}
+                    <div className="flex-1 relative bg-gray-50 overflow-hidden border-b-4 border-black">
+                      <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none">
+                        <Folder className="w-48 h-48" />
                       </div>
                     </div>
 
                     {/* Folder Footer Info */}
                     <div className="p-5 bg-white flex flex-col gap-1 relative overflow-hidden">
                        <div className={`absolute left-0 top-0 bottom-0 w-2 ${getCategoryColor(cat.category)} border-r-2 border-black`} />
-                       <div className="flex items-center justify-between pl-2">
-                        <div>
+                       <div className="flex items-center justify-between gap-6 pl-3 pr-2">
+                        <div className="min-w-0">
                           <h3 className="heading-brut text-2xl leading-none uppercase tracking-tighter">{cat.category}</h3>
                         </div>
-                        <div className="w-10 h-10 border-[3px] border-black flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
-                          <ArrowRight className="w-5 h-5" />
+                        <div className="flex items-center gap-4 shrink-0">
+                          <div className="bg-white border-[3px] border-black px-3 py-1 font-black text-[10px] tracking-widest uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                            {cat.count} FILES
+                          </div>
+                          <div className="w-11 h-11 border-[3px] border-black flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all ml-1">
+                            <ArrowRight className="w-5 h-5" />
+                          </div>
                         </div>
                       </div>
                     </div>

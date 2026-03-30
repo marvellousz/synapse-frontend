@@ -25,7 +25,7 @@ export default function ToastMessage({ message, variant = "info", onClose }: Pro
   const Icon = variant === "error" ? AlertCircle : variant === "success" ? CheckCircle2 : Info;
 
   return (
-    <div className="fixed top-6 right-6 z-50 max-w-md w-[calc(100%-3rem)]" role="status" aria-live="polite">
+    <div className="fixed top-20 right-6 z-80 max-w-md w-[calc(100%-3rem)]" role="status" aria-live="polite">
       <div className={`border-2 p-4 font-bold text-sm flex items-start gap-3 ${styleByVariant[variant]}`}>
         <Icon className="w-5 h-5 mt-0.5 shrink-0" />
         <p className="flex-1">{message}</p>

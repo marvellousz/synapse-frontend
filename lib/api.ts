@@ -98,6 +98,13 @@ export async function deleteAccount(password: string): Promise<{ message: string
   });
 }
 
+export async function confirmDeleteAccount(token: string): Promise<{ message: string }> {
+  return api<{ message: string }>("/auth/confirm-delete-account", {
+    method: "POST",
+    body: JSON.stringify({ token }),
+  });
+}
+
 /** Memories */
 export async function listMemories(params?: {
   type?: string;
