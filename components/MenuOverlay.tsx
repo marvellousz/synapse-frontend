@@ -11,11 +11,11 @@ interface MenuOverlayProps {
 
 const MENU_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/memories", label: "Archive" },
-  { href: "/folders", label: "Folders" },
-  { href: "/graph", label: "Graph" },
-  { href: "/chat", label: "Chat" },
+  { href: "/about", label: "About" },
   { href: "/features", label: "Features" },
+  { href: "/workflow", label: "Workflow" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/blog", label: "Blog" },
 ];
 
 export default function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
