@@ -4,14 +4,13 @@ import { useState } from "react";
 import type { Memory, MemoryCreate, MemoryUpdate } from "@/lib/types";
 import Dropdown from "@/components/Dropdown";
 
-const TYPES = ["pdf", "image", "video", "text", "webpage", "youtube"] as const;
+const TYPES = ["pdf", "image", "video", "text", "webpage"] as const;
 const TYPE_OPTIONS = [
   { value: "pdf" as const, label: "PDF" },
   { value: "image" as const, label: "Image" },
   { value: "video" as const, label: "Video" },
   { value: "text" as const, label: "Text" },
   { value: "webpage" as const, label: "Webpage" },
-  { value: "youtube" as const, label: "YouTube" },
 ];
 const STATUSES = ["processing", "ready", "failed"] as const;
 const STATUS_OPTIONS = [
@@ -58,7 +57,7 @@ export default function MemoryForm(props: Props) {
             contentHash: generateContentHash(),
             title: title || null,
             summary: summary || null,
-            sourceUrl: type === "webpage" || type === "youtube" ? (sourceUrl || null) : null,
+            sourceUrl: type === "webpage" ? (sourceUrl || null) : null,
             status: "processing",
           },
           files.length > 0 ? files : undefined
@@ -67,7 +66,7 @@ export default function MemoryForm(props: Props) {
         await props.onSubmit({
           title: title || null,
           summary: summary || null,
-          sourceUrl: type === "webpage" || type === "youtube" ? (sourceUrl || null) : null,
+          sourceUrl: type === "webpage" ? (sourceUrl || null) : null,
           status,
         });
       }
@@ -98,7 +97,7 @@ export default function MemoryForm(props: Props) {
             options={TYPE_OPTIONS}
             onChange={(t) => {
               setType(t as Memory["type"]);
-              if (t !== "webpage" && t !== "youtube") setSourceUrl("");
+              if (t !== "webpage") setSourceUrl("");
             }}
             placeholder="Select type"
           />
@@ -158,17 +157,17 @@ export default function MemoryForm(props: Props) {
         />
       </div>
 
-      {(type === "webpage" || type === "youtube") && (
+      {type === "webpage" && (
         <div className="space-y-2">
           <label className="block font-black uppercase text-[10px] tracking-widest text-gray-500">
-            {type === "youtube" ? "YOUTUBE URL" : "EXTERNAL LINK"}
+            EXTERNAL LINK
           </label>
           <input
             type="url"
             value={sourceUrl}
             onChange={(e) => setSourceUrl(e.target.value)}
             className="brut-input py-4 font-bold bg-gray-50 focus:bg-white"
-            placeholder={type === "youtube" ? "https://www.youtube.com/watch?v=..." : "https://..."}
+            placeholder="https://..."
           />
         </div>
       )}

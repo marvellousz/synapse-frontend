@@ -9,7 +9,7 @@ import MemoryCard from "@/components/MemoryCard";
 import { PlusCircle, Loader2, Search, Filter, Folder, X, LayoutGrid, Share2 } from "lucide-react";
 
 const CATEGORIES = [
-  "Personal", "Work", "Education", "Technology", "Finance", 
+  "Personal", "Work", "Education", "Technology", "Finance",
   "Health", "Entertainment", "Science", "Legal", "Travel",
   "Miscellaneous"
 ];
@@ -17,11 +17,12 @@ const CATEGORIES = [
 export default function MemoriesPage() {
   const searchParams = useSearchParams();
   const urlCategory = searchParams.get("category");
-  
+
   const [memories, setMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(urlCategory);
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
   useEffect(() => {
     setSelectedCategory(urlCategory);
@@ -45,6 +46,14 @@ export default function MemoriesPage() {
     };
   }, [selectedCategory]);
 
+  const sortedMemories = useMemo(() => {
+    return [...memories].sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+    });
+  }, [memories, sortOrder]);
+
   return (
     <div className="space-y-12 h-full flex flex-col">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -52,10 +61,19 @@ export default function MemoriesPage() {
           <h1 className="heading-brut text-5xl md:text-6xl">Memories.</h1>
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4 items-center">
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest")}
+            className="px-4 py-3 border-2 border-black font-bold text-xs uppercase cursor-pointer bg-white focus:outline-none shadow-[4px_4px_0px_0px_black] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_black] transition-all"
+          >
+            <option value="newest">Most Recent</option>
+            <option value="oldest">Least Recent</option>
+          </select>
+
           <Link
             href="/memories/new"
-            className="brut-button px-6 bg-indigo-600 text-white"
+            className="brut-button px-6 bg-indigo-600 text-white flex items-center h-full"
           >
             <PlusCircle className="w-5 h-5" />
             <span className="ml-2">NEW MEMORY</span>
@@ -71,7 +89,7 @@ export default function MemoriesPage() {
               <Folder className="w-4 h-4" />
               <h3 className="font-black uppercase text-sm">Folders</h3>
             </div>
-            
+
             <div className="flex flex-wrap lg:flex-col gap-2">
               <button
                 onClick={() => setSelectedCategory(null)}
@@ -83,7 +101,7 @@ export default function MemoriesPage() {
                 </span>
                 <span className="opacity-50">{!selectedCategory ? memories.length : ''}</span>
               </button>
-              
+
               {CATEGORIES.map(cat => (
                 <button
                   key={cat}
@@ -138,8 +156,8 @@ export default function MemoriesPage() {
               </div>
               <h3 className="heading-brut text-3xl mb-4">{selectedCategory ? 'Category Empty' : 'No memories yet.'}</h3>
               <p className="font-bold text-gray-500 mb-10 max-w-sm uppercase text-sm tracking-widest">
-                {selectedCategory 
-                  ? `No memories found in the "${selectedCategory}" folder.` 
+                {selectedCategory
+                  ? `No memories found in the "${selectedCategory}" folder.`
                   : "Your second brain is currently empty. Start by capturing your first thought."}
               </p>
               {!selectedCategory ? (
@@ -156,7 +174,7 @@ export default function MemoriesPage() {
             </div>
           ) : (
             <div className="grid gap-6">
-              {memories.map((m) => (
+              {sortedMemories.map((m) => (
                 <MemoryCard key={m.id} memory={m} />
               ))}
             </div>

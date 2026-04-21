@@ -89,6 +89,35 @@ export default function MemoryDetailPage() {
     }
   }
 
+  let coverImageUrl: string | undefined = undefined;
+  let isYoutube = false;
+  let youtubeEmbedUrl: string | undefined = undefined;
+
+  if (memory?.sourceUrl) {
+    const ytMatch = memory.sourceUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+    if (ytMatch) {
+      isYoutube = true;
+      coverImageUrl = `https://img.youtube.com/vi/${ytMatch[1]}/maxresdefault.jpg`;
+      const timeMatch = memory.sourceUrl.match(/[?&]t=([^&]+)/);
+      const timeParam = timeMatch ? `&start=${parseInt(timeMatch[1])}` : '';
+      youtubeEmbedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=0${timeParam}`;
+    }
+  }
+  if (!coverImageUrl && uploads.length > 0) {
+    const imageUpload = uploads.find((u) => u.mimeType?.startsWith("image/") || u.fileType?.startsWith("image/"));
+    if (imageUpload) {
+      coverImageUrl = imageUpload.fileUrl;
+    }
+  }
+
+  // Extract first image from markdown if no cover image exists
+  if (!coverImageUrl && memory?.extractedText) {
+    const imgMatch = memory.extractedText.match(/!\[.*?\]\((.*?)\)/);
+    if (imgMatch) {
+      coverImageUrl = imgMatch[1];
+    }
+  }
+
   if (loading && !memory) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -172,37 +201,56 @@ export default function MemoryDetailPage() {
         </div>
       ) : (
         <div className="brut-card p-0 overflow-hidden bg-white">
+          {coverImageUrl && !isYoutube && (
+            <div
+              className="w-full border-b-4 border-black relative bg-gray-100 flex items-center justify-center cursor-pointer"
+              onClick={() => window.open(coverImageUrl, '_blank')}
+            >
+              <img src={coverImageUrl} alt="Cover Preview" className="w-full h-auto max-h-[80vh] object-contain" />
+            </div>
+          )}
+          {isYoutube && youtubeEmbedUrl && (
+            <div className="w-full aspect-video border-b-4 border-black bg-black">
+              <iframe
+                src={youtubeEmbedUrl}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          )}
           <div className="bg-indigo-600 border-b-4 border-black p-4 flex justify-between items-center">
             <div className="flex items-center gap-4 text-white font-black uppercase text-[10px] tracking-widest">
               <span className="bg-black/20 px-2 py-1 border border-white/20">Type: {memory.type}</span>
               <span className="bg-black/20 px-2 py-1 border border-white/20">Saved: {new Date(memory.createdAt).toLocaleDateString()}</span>
             </div>
+          </div>
+
+          <div className="p-8 md:p-10 space-y-10">
             {memory.sourceUrl && (
               <a
                 href={memory.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-indigo-100 hover:text-white transition-colors"
-                title="View original source"
+                className="brut-button w-full flex items-center justify-center gap-3 py-4 text-lg bg-indigo-50 border-indigo-600 text-indigo-700 hover:bg-indigo-600 hover:text-white transition-colors"
               >
                 <Sparkles className="w-5 h-5" />
+                VIEW ORIGINAL SOURCE
               </a>
             )}
-          </div>
 
-          <div className="p-8 md:p-10 space-y-10">
             <section>
               <h3 className="font-black uppercase text-xs tracking-widest text-indigo-600 mb-4 flex items-center gap-2">
                 <div className="w-1.5 h-4 bg-indigo-600" />
                 Executive Summary
               </h3>
-              <p className="text-xl font-bold leading-snug lg:max-w-4xl text-black">
+              <div className="text-xl font-bold leading-relaxed lg:max-w-4xl text-black whitespace-pre-wrap">
                 {memory.summary
                   ? memory.summary
                   : memory.extractedText
                     ? `${memory.extractedText.slice(0, 300).trim()}${memory.extractedText.length > 300 ? "…" : ""}`
                     : "No summary available. Upload files and re-process."}
-              </p>
+              </div>
             </section>
 
             <section>
@@ -272,20 +320,6 @@ export default function MemoryDetailPage() {
                 )}
                 {processing ? "PROCESSING BRAIN..." : "RE-PROCESS (SYNC AI STATS)"}
               </button>
-
-              {memory.sourceUrl && (
-                <div className="flex-1 flex justify-end">
-                  <span className="font-black text-[10px] uppercase text-gray-400 mr-2">Source:</span>
-                  <a
-                    href={memory.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-black text-[10px] uppercase text-indigo-600 underline truncate max-w-xs"
-                  >
-                    {memory.sourceUrl}
-                  </a>
-                </div>
-              )}
             </div>
           </div>
         </div>

@@ -7,8 +7,10 @@ import { Loader2, Zap, Tag, Folder, ArrowLeft, RefreshCw, ZoomIn, Info, X } from
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 
-// Dynamically import ForceGraph2D to avoid SSR issues
-const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
+import * as THREE from "three";
+
+// Dynamically import ForceGraph3D to avoid SSR issues
+const ForceGraph3D = dynamic(() => import("react-force-graph-3d"), {
   ssr: false,
 });
 
@@ -173,7 +175,7 @@ export default function GraphPage() {
           )}
 
           {containerSize.width > 0 && containerSize.height > 0 && (
-            <ForceGraph2D
+            <ForceGraph3D
               ref={fgRef}
               graphData={data}
               width={containerSize.width}
@@ -182,60 +184,102 @@ export default function GraphPage() {
               nodeLabel={nodeLabel}
               linkLabel={(link: any) => `
                 <div style="background: white; border: 2px solid black; padding: 6px; box-shadow: 4px 4px 0px 0px rgba(0,0,0,1); font-size: 10px;">
-                  <div style="font-weight: 900; text-transform: uppercase; border-bottom: 2px solid #EEE; margin-bottom: 4px; padding-bottom: 2px;">Shared Connections</div>
-                  <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                    ${link.sharedTags?.map((t: string) => `<span style="background: #F3F4F6; color: black; padding: 1px 4px; font-weight: 900; border: 1px solid black;">#${t}</span>`).join('') || 'Generic link'}
+                  <div style="font-weight: 900; text-transform: uppercase; border-bottom: 2px solid #EEE; margin-bottom: 4px; padding-bottom: 2px;">
+                    ${link.type === 'tag' ? 'Shared Tags' : 'Semantic Similarity'}
+                  </div>
+                  <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
+                    ${link.type === 'tag' 
+                      ? link.sharedTags?.map((t: string) => `<span style="background: #F3F4F6; color: black; padding: 1px 4px; font-weight: 900; border: 1px solid black;">#${t}</span>`).join('') 
+                      : `<span style="font-bold">Score: ${link.similarity}</span>`
+                    }
                   </div>
                 </div>
               `}
               nodeRelSize={8}
               nodeVal={(n: any) => (n.tags?.length || 1) + 2}
-              linkColor={() => "#CBD5E1"}
-              linkWidth={1}
-              linkDirectionalParticles={1}
+              linkColor={(link: any) => link.type === 'tag' ? "#CBD5E1" : "#818CF8"}
+              linkWidth={(link: any) => link.type === 'tag' ? 1 : 2}
+              linkDirectionalParticles={2}
               linkDirectionalParticleSpeed={0.005}
-              onNodeClick={(node: any) => setSelectedNode(node)}
+              linkDirectionalParticleWidth={2}
+              onNodeClick={(node: any) => {
+                setSelectedNode(node);
+                // Aim at node from outside it
+                const distance = 40;
+                const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+                fgRef.current.cameraPosition(
+                    { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
+                    node, // lookAt ({ x, y, z })
+                    3000  // ms transition duration
+                );
+              }}
               onNodeHover={(node: any) => setHoverNode(node)}
               onBackgroundClick={() => setSelectedNode(null)}
-              cooldownTicks={100}
-              onEngineStop={() => {
-                if (fgRef.current) fgRef.current.zoomToFit(400, 50);
-              }}
-              nodeCanvasObject={(node: any, ctx, globalScale) => {
-                const label = node.title;
-                const fontSize = 12 / globalScale;
-                const radius = (node.tags?.length || 1) + 4;
+              nodeThreeObject={(node: any) => {
                 const color = nodeColor(node);
-                const isSelected = node === selectedNode;
-                const isHover = node === hoverNode;
-
-                // Draw Circle Shadow/Outer Ring
-                ctx.beginPath();
-                ctx.arc(node.x, node.y, radius + (isHover || isSelected ? 2 : 1), 0, 2 * Math.PI, false);
-                ctx.fillStyle = isSelected ? '#F43F5E' : (isHover ? '#22C55E' : '#00000022');
-                ctx.fill();
-
-                // Draw Core Circle
-                ctx.beginPath();
-                ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
-                ctx.fillStyle = color;
-                ctx.fill();
+                const size = (node.tags?.length || 1) + 4;
                 
-                // Draw Border
-                ctx.strokeStyle = isSelected || isHover ? 'white' : 'black';
-                ctx.lineWidth = 1 / globalScale;
-                ctx.stroke();
+                // Group to hold sphere and label
+                const group = new THREE.Group();
 
-                // Draw Label if zoomed in enough
-                if (globalScale > 1.2) {
-                  ctx.font = `${fontSize}px Inter, sans-serif`;
-                  ctx.textAlign = 'center';
-                  ctx.textBaseline = 'top';
-                  ctx.fillStyle = '#111827';
-                  const shortLabel = label.length > 20 ? label.substring(0, 17) + '...' : label;
-                  ctx.fillText(shortLabel, node.x, node.y + radius + 4);
+                // Core Sphere
+                const geometry = new THREE.SphereGeometry(size);
+                const material = new THREE.MeshPhongMaterial({ 
+                    color: color,
+                    transparent: true,
+                    opacity: 0.9,
+                    shininess: 100
+                });
+                const sphere = new THREE.Mesh(geometry, material);
+                
+                // Add a black wireframe for that "brutalist" look
+                const wireframeGeometry = new THREE.SphereGeometry(size + 0.1);
+                const wireframeMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0x000000, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.1
+                });
+                const wireframe = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
+                sphere.add(wireframe);
+                group.add(sphere);
+
+                // Add Label Sprite
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                if (context) {
+                    const label = node.title.length > 20 ? node.title.substring(0, 17) + '...' : node.title;
+                    context.font = 'Bold 24px Inter, sans-serif';
+                    const textWidth = context.measureText(label).width;
+                    
+                    canvas.width = textWidth + 20;
+                    canvas.height = 40;
+                    
+                    // Label Background
+                    context.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    context.fillRect(0, 0, canvas.width, canvas.height);
+                    context.strokeStyle = 'black';
+                    context.lineWidth = 2;
+                    context.strokeRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Text
+                    context.fillStyle = 'black';
+                    context.font = 'Bold 24px Inter, sans-serif';
+                    context.textAlign = 'center';
+                    context.textBaseline = 'middle';
+                    context.fillText(label, canvas.width / 2, canvas.height / 2);
+                    
+                    const texture = new THREE.CanvasTexture(canvas);
+                    const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+                    const sprite = new THREE.Sprite(spriteMaterial);
+                    sprite.position.set(0, size + 10, 0);
+                    sprite.scale.set(canvas.width / 5, canvas.height / 5, 1);
+                    group.add(sprite);
                 }
+
+                return group;
               }}
+              cooldownTicks={100}
             />
           )}
 
@@ -244,6 +288,16 @@ export default function GraphPage() {
             <div className="flex gap-2">
                <button onClick={() => fgRef.current?.zoomToFit(400, 50)} className="bg-white border-2 border-black p-2 hover:bg-gray-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none">
                  <ZoomIn className="w-4 h-4" />
+               </button>
+               <button 
+                onClick={() => {
+                    const { x, y, z } = fgRef.current.cameraPosition();
+                    fgRef.current.cameraPosition({ x: x + 100, y: y + 100, z: z + 100 }, { x: 0, y: 0, z: 0 }, 1000);
+                }} 
+                className="bg-white border-2 border-black p-2 hover:bg-gray-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+                title="Rotate View"
+               >
+                 <RefreshCw className="w-4 h-4" />
                </button>
             </div>
           </div>
