@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { listMemories } from "@/lib/api";
 import type { Memory } from "@/lib/types";
 import MemoryCard from "@/components/MemoryCard";
+import SortDropdown from "@/components/SortDropdown";
 import { PlusCircle, Loader2, Search, Filter, Folder, X, LayoutGrid, Share2 } from "lucide-react";
 
 const CATEGORIES = [
@@ -62,18 +63,18 @@ export default function MemoriesPage() {
         </div>
 
         <div className="flex flex-wrap gap-4 items-center">
-          <select
+          <SortDropdown
             value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest")}
-            className="px-4 py-3 border-2 border-black font-bold text-xs uppercase cursor-pointer bg-white focus:outline-none shadow-[4px_4px_0px_0px_black] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_black] transition-all"
-          >
-            <option value="newest">Most Recent</option>
-            <option value="oldest">Least Recent</option>
-          </select>
+            onChange={(value) => setSortOrder(value as "newest" | "oldest")}
+            options={[
+              { value: "newest", label: "Most Recent" },
+              { value: "oldest", label: "Least Recent" },
+            ]}
+          />
 
           <Link
             href="/memories/new"
-            className="brut-button px-6 bg-indigo-600 text-white flex items-center h-full"
+            className="brut-button px-4 py-3 bg-indigo-600 text-white flex items-center font-bold text-xs uppercase shadow-[2px_2px_0px_0px_black] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_black] transition-all"
           >
             <PlusCircle className="w-5 h-5" />
             <span className="ml-2">NEW MEMORY</span>

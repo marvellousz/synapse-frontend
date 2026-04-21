@@ -9,13 +9,15 @@ import {
   deleteMemory,
   listUploads,
   processMemory,
+  searchAPI,
 } from "@/lib/api";
 import type { Memory, MemoryUpdate, Upload } from "@/lib/types";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import MemoryForm from "@/components/MemoryForm";
 import UploadForm from "@/components/UploadForm";
 import UploadList from "@/components/UploadList";
-import { ArrowLeft, Loader2, Trash2, Edit2, RefreshCw, ChevronDown, ChevronUp, Sparkles, FileText } from "lucide-react";
+import MemoryCard from "@/components/MemoryCard";
+import { ArrowLeft, Loader2, Trash2, Edit2, RefreshCw, ChevronDown, ChevronUp, Sparkles, FileText, Link as LinkIcon } from "lucide-react";
 
 export default function MemoryDetailPage() {
   const params = useParams();
@@ -23,7 +25,9 @@ export default function MemoryDetailPage() {
   const id = params.id as string;
   const [memory, setMemory] = useState<Memory | null>(null);
   const [uploads, setUploads] = useState<Upload[]>([]);
+  const [relatedMemories, setRelatedMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingRelated, setLoadingRelated] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -39,11 +43,26 @@ export default function MemoryDetailPage() {
       .then(([mem, ups]) => {
         setMemory(mem);
         setUploads(ups);
+        // Load related memories after getting the main memory
+        loadRelated();
       })
       .catch((err) => {
         setError(err instanceof Error ? err.message : "Failed to load");
       })
       .finally(() => setLoading(false));
+  }
+
+  function loadRelated() {
+    setLoadingRelated(true);
+    searchAPI.getRelated(id, 5)
+      .then((related) => {
+        setRelatedMemories(related.filter((m: Memory) => m.id !== id) as Memory[]);
+      })
+      .catch((err) => {
+        console.error("Failed to load related memories:", err);
+        setRelatedMemories([]);
+      })
+      .finally(() => setLoadingRelated(false));
   }
 
   useEffect(() => {
@@ -341,6 +360,30 @@ export default function MemoryDetailPage() {
           </div>
         </section>
       </div>
+
+      {relatedMemories.length > 0 && (
+        <div className="grid lg:grid-cols-1 gap-12">
+          <section className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="w-8 h-8 bg-black flex items-center justify-center rotate-[-5deg]">
+                <LinkIcon className="w-5 h-5 text-white" />
+              </div>
+              <h2 className="heading-brut text-3xl">Related Memories.</h2>
+            </div>
+            <div className="space-y-4">
+              {loadingRelated ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
+                </div>
+              ) : (
+                relatedMemories.map((relatedMemory) => (
+                  <MemoryCard key={relatedMemory.id} memory={relatedMemory} />
+                ))
+              )}
+            </div>
+          </section>
+        </div>
+      )}
 
       <ConfirmDialog
         open={showDeleteConfirm}
