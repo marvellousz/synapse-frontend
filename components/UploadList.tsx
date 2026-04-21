@@ -7,9 +7,17 @@ import { FileText, ExternalLink, Trash2, Loader2, Image, Video, FileCode } from 
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-function fileUrlHref(fileUrl: string): string {
-  if (fileUrl.startsWith("http")) return fileUrl;
-  return `${API_BASE}${fileUrl}`;
+function fileUrlHref(fileUrl: string, fileType?: string): string {
+  let base = fileUrl;
+  if (!base.startsWith("http")) {
+    base = `${API_BASE}${base}`;
+  }
+  
+  if (fileType && fileType.toLowerCase() === "pdf") {
+    const sep = base.includes("?") ? "&" : "?";
+    return `${base}${sep}download=true`;
+  }
+  return base;
 }
 
 function getFileIcon(fileType: string) {
@@ -102,9 +110,10 @@ export default function UploadList({
               </div>
               <div className="flex items-center gap-3 flex-shrink-0">
                 <a
-                  href={fileUrlHref(u.fileUrl)}
+                  href={fileUrlHref(u.fileUrl, u.fileType)}
                   target="_blank"
                   rel="noopener noreferrer"
+                  download={u.fileType.toLowerCase() === "pdf"}
                   className="brut-button p-2.5 bg-white text-black text-xs shadow-[2px_2px_0px_0px_black]"
                   title="Open file"
                 >
