@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { getMemoryCategories } from "@/lib/api";
-import { Loader2, Folder, ArrowRight, Info } from "lucide-react";
+import { getMemoryCategories, listMemories } from "@/lib/api";
+import { Loader2, Folder, ArrowRight, Info, CalendarDays } from "lucide-react";
 import { motion } from "motion/react";
 
 interface CategorySummary {
@@ -11,17 +11,42 @@ interface CategorySummary {
   count: number;
 }
 
+interface DateSummary {
+  date: string;
+  count: number;
+}
+
+type FolderView = "category" | "date";
+
 export default function FoldersPage() {
   const [categories, setCategories] = useState<CategorySummary[]>([]);
+  const [dateFolders, setDateFolders] = useState<DateSummary[]>([]);
+  const [folderView, setFolderView] = useState<FolderView>("category");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getMemoryCategories()
-      .then(setCategories)
+    Promise.all([getMemoryCategories(), listMemories({ take: 100 })])
+      .then(([categoryData, memories]) => {
+        setCategories(categoryData);
+        const counts = new Map<string, number>();
+        memories.forEach((memory) => {
+          const dateKey = memory.createdAt.slice(0, 10);
+          counts.set(dateKey, (counts.get(dateKey) ?? 0) + 1);
+        });
+        const dateData = Array.from(counts.entries())
+          .sort((a, b) => new Date(b[0]).getTime() - new Date(a[0]).getTime())
+          .map(([date, count]) => ({ date, count }));
+        setDateFolders(dateData);
+      })
       .catch((err) => setError(err.message || "Failed to load folders"))
       .finally(() => setLoading(false));
   }, []);
+
+  const activeItems = useMemo(
+    () => (folderView === "category" ? categories : dateFolders),
+    [folderView, categories, dateFolders]
+  );
 
   const getCategoryColor = (cat: string) => {
       const colors: Record<string, string> = {
@@ -47,6 +72,20 @@ export default function FoldersPage() {
           <h1 className="heading-brut text-5xl md:text-6xl">Folders.</h1>
           <p className="font-bold text-gray-400 uppercase text-xs tracking-[0.2em] mt-2">Manage your structured brain segments</p>
         </div>
+        <div className="grid grid-cols-2 gap-2 w-full md:w-auto">
+          <button
+            onClick={() => setFolderView("category")}
+            className={`px-3 py-2 border-2 border-black font-black text-[10px] uppercase ${folderView === "category" ? "bg-black text-white" : "bg-white hover:bg-gray-100"}`}
+          >
+            Category Folders
+          </button>
+          <button
+            onClick={() => setFolderView("date")}
+            className={`px-3 py-2 border-2 border-black font-black text-[10px] uppercase ${folderView === "date" ? "bg-black text-white" : "bg-white hover:bg-gray-100"}`}
+          >
+            Date Folders
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -65,41 +104,58 @@ export default function FoldersPage() {
           <p className="font-black mb-8 uppercase text-sm tracking-widest leading-relaxed">{error}</p>
           <button onClick={() => window.location.reload()} className="brut-button bg-rose-500 w-full justify-center py-4">Retry Hardware Scan</button>
         </div>
-      ) : categories.length === 0 ? (
+      ) : activeItems.length === 0 ? (
           <div className="brut-card p-16 bg-white text-center flex flex-col items-center max-w-3xl mx-auto border-dashed">
             <div className="w-24 h-24 bg-gray-50 border-4 border-black border-dashed flex items-center justify-center mb-8">
               <Folder className="w-12 h-12 text-gray-300" />
             </div>
-            <h3 className="heading-brut text-4xl mb-4 italic">No Segments.</h3>
+            <h3 className="heading-brut text-4xl mb-4 italic">No {folderView === "category" ? "Segments" : "Date Folders"}.</h3>
             <p className="font-black text-gray-400 uppercase text-xs tracking-widest leading-relaxed max-w-md">The disk is clean. Upload content to trigger the autonomous categorization engine and populate your directories.</p>
             <Link href="/memories/new" className="brut-button mt-10 px-12 py-5 text-lg">Initialize Brain</Link>
           </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
-          {categories.map((cat, i) => (
+          {activeItems.map((item, i) => (
             <motion.div
-              key={cat.category}
+              key={folderView === "category" ? (item as CategorySummary).category : (item as DateSummary).date}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.05, type: "spring", stiffness: 200 }}
             >
-              <Link href={`/memories?category=${encodeURIComponent(cat.category)}`} className="group block">
+              <Link
+                href={
+                  folderView === "category"
+                    ? `/memories?category=${encodeURIComponent((item as CategorySummary).category)}`
+                    : `/memories?date=${encodeURIComponent((item as DateSummary).date)}`
+                }
+                className="group block"
+              >
                 <div className="brut-card bg-white p-5 relative overflow-hidden group-hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all">
-                  <div className={`absolute left-0 top-0 bottom-0 w-2 ${getCategoryColor(cat.category)} border-r-2 border-black`} />
+                  <div className={`absolute left-0 top-0 bottom-0 w-2 ${folderView === "category" ? getCategoryColor((item as CategorySummary).category) : "bg-indigo-400"} border-r-2 border-black`} />
 
                   <div className="pl-4 pr-2 space-y-4">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-12 h-12 border-[3px] border-black bg-gray-50 flex items-center justify-center shrink-0">
-                        <Folder className="w-6 h-6 text-gray-500" />
+                        {folderView === "category" ? (
+                          <Folder className="w-6 h-6 text-gray-500" />
+                        ) : (
+                          <CalendarDays className="w-6 h-6 text-gray-500" />
+                        )}
                       </div>
                       <h3 className="heading-brut text-3xl leading-none uppercase tracking-tighter truncate">
-                        {cat.category}
+                        {folderView === "category"
+                          ? (item as CategorySummary).category
+                          : new Date((item as DateSummary).date).toLocaleDateString(undefined, {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })}
                       </h3>
                     </div>
 
                     <div className="flex items-center justify-between gap-4 flex-wrap">
                       <div className="bg-white border-[3px] border-black px-3 py-1 font-black text-[10px] tracking-widest uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                        {cat.count} FILES
+                        {item.count} FILES
                       </div>
                       <div className="w-11 h-11 border-[3px] border-black flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all shrink-0">
                         <ArrowRight className="w-5 h-5" />
@@ -121,7 +177,7 @@ export default function FoldersPage() {
         <div className="flex-1">
           <h4 className="font-black uppercase text-sm mb-2 text-indigo-900 border-b-2 border-indigo-200 inline-block tracking-widest">Autonomous Logical Partitioning</h4>
           <p className="text-xs font-bold text-indigo-800/60 italic leading-relaxed max-w-4xl">
-            Synapse categorizes your high-resolution memories using semantic clustering. These virtual folders are not static; they represent the evolving structure of your personal knowledge engine.
+            Synapse groups your memories into semantic categories and also by capture date, so you can browse your knowledge engine by topic or by timeline.
           </p>
         </div>
       </div>

@@ -56,3 +56,7 @@ export interface Upload {
   fileSize: number;
   createdAt: string;
 }
+
+export interface RelatedMemory extends Memory {
+  similarity: number;
+}
