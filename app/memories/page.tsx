@@ -7,13 +7,8 @@ import { listMemories } from "@/lib/api";
 import type { Memory } from "@/lib/types";
 import MemoryCard from "@/components/MemoryCard";
 import SortDropdown from "@/components/SortDropdown";
+import { useMemoryCategories } from "@/hooks/useMemoryCategories";
 import { PlusCircle, Loader2, Search, Folder, X, LayoutGrid, CalendarDays } from "lucide-react";
-
-const CATEGORIES = [
-  "Personal", "Work", "Education", "Technology", "Finance",
-  "Health", "Entertainment", "Science", "Legal", "Travel",
-  "Miscellaneous"
-];
 
 type FolderView = "category" | "date";
 
@@ -36,6 +31,7 @@ export default function MemoriesPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(urlDate);
   const [folderView, setFolderView] = useState<FolderView>(urlDate ? "date" : "category");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const { categories } = useMemoryCategories();
 
   useEffect(() => {
     setSelectedCategory(urlCategory);
@@ -119,7 +115,7 @@ export default function MemoriesPage() {
 
           <Link
             href="/memories/new"
-            className="brut-button px-4 py-3 bg-indigo-600 text-white flex items-center font-bold text-xs uppercase shadow-[2px_2px_0px_0px_black] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_black] transition-all"
+            className="brut-button px-4 py-3 bg-indigo-600 text-white flex items-center font-bold text-xs uppercase shadow-[2px_2px_0px_0px_black] hover:translate-x-px hover:translate-y-px hover:shadow-[1px_1px_0px_0px_black] transition-all"
           >
             <PlusCircle className="w-5 h-5" />
             <span className="ml-2">NEW MEMORY</span>
@@ -172,7 +168,7 @@ export default function MemoriesPage() {
               </button>
 
               {folderView === "category" ? (
-                CATEGORIES.map(cat => (
+                categories.map(({ category: cat }) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)}

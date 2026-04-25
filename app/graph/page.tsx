@@ -144,7 +144,7 @@ export default function GraphPage() {
         {/* Graph Container */}
         <div 
           ref={containerRef}
-          className="flex-1 brut-card bg-white relative overflow-hidden grid-bg min-h-[500px]"
+          className="flex-1 brut-card bg-white relative overflow-hidden grid-bg min-h-125"
         >
           {loading && (
             <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
@@ -185,10 +185,12 @@ export default function GraphPage() {
               linkLabel={(link: any) => `
                 <div style="background: white; border: 2px solid black; padding: 6px; box-shadow: 4px 4px 0px 0px rgba(0,0,0,1); font-size: 10px;">
                   <div style="font-weight: 900; text-transform: uppercase; border-bottom: 2px solid #EEE; margin-bottom: 4px; padding-bottom: 2px;">
-                    ${link.type === 'tag' ? 'Shared Tags' : 'Semantic Similarity'}
+                    ${link.type === 'category' ? 'Same Category' : link.type === 'tag' ? 'Shared Tags' : 'Semantic Similarity'}
                   </div>
                   <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
-                    ${link.type === 'tag' 
+                    ${link.type === 'category'
+                      ? `<span style="background: #E0E7FF; color: #4338CA; padding: 1px 4px; font-weight: 900; border: 1px solid #4338CA; text-transform: uppercase;">${link.category ?? 'Category'}</span>`
+                      : link.type === 'tag' 
                       ? link.sharedTags?.map((t: string) => `<span style="background: #F3F4F6; color: black; padding: 1px 4px; font-weight: 900; border: 1px solid black;">#${t}</span>`).join('') 
                       : `<span style="font-bold">Score: ${link.similarity}</span>`
                     }
@@ -197,8 +199,8 @@ export default function GraphPage() {
               `}
               nodeRelSize={8}
               nodeVal={(n: any) => (n.tags?.length || 1) + 2}
-              linkColor={(link: any) => link.type === 'tag' ? "#CBD5E1" : "#818CF8"}
-              linkWidth={(link: any) => link.type === 'tag' ? 1 : 2}
+              linkColor={(link: any) => link.type === 'category' ? "#A5B4FC" : link.type === 'tag' ? "#CBD5E1" : "#818CF8"}
+              linkWidth={(link: any) => link.type === 'category' ? 1 : link.type === 'tag' ? 1 : 2}
               linkDirectionalParticles={2}
               linkDirectionalParticleSpeed={0.005}
               linkDirectionalParticleWidth={2}
@@ -286,7 +288,7 @@ export default function GraphPage() {
           {/* Graph Controls overlay */}
           <div className="absolute bottom-6 left-6 flex flex-col gap-2">
             <div className="flex gap-2">
-               <button onClick={() => fgRef.current?.zoomToFit(400, 50)} className="bg-white border-2 border-black p-2 hover:bg-gray-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none">
+               <button onClick={() => fgRef.current?.zoomToFit(400, 50)} className="bg-white border-2 border-black p-2 hover:bg-gray-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-px active:translate-y-px active:shadow-none">
                  <ZoomIn className="w-4 h-4" />
                </button>
                <button 
@@ -294,7 +296,7 @@ export default function GraphPage() {
                     const { x, y, z } = fgRef.current.cameraPosition();
                     fgRef.current.cameraPosition({ x: x + 100, y: y + 100, z: z + 100 }, { x: 0, y: 0, z: 0 }, 1000);
                 }} 
-                className="bg-white border-2 border-black p-2 hover:bg-gray-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+                className="bg-white border-2 border-black p-2 hover:bg-gray-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-px active:translate-y-px active:shadow-none"
                 title="Rotate View"
                >
                  <RefreshCw className="w-4 h-4" />
@@ -316,7 +318,7 @@ export default function GraphPage() {
               >
                 <button 
                   onClick={() => setSelectedNode(null)}
-                  className="absolute top-4 right-4 w-8 h-8 bg-rose-500 text-white border-2 border-black flex items-center justify-center hover:bg-rose-600 shadow-[2px_2px_0px_0px_black] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all z-10"
+                  className="absolute top-4 right-4 w-8 h-8 bg-rose-500 text-white border-2 border-black flex items-center justify-center hover:bg-rose-600 shadow-[2px_2px_0px_0px_black] active:translate-x-px active:translate-y-px active:shadow-none transition-all z-10"
                   title="Close Panel"
                 >
                   <X className="w-5 h-5" />

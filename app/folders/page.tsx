@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { getMemoryCategories, listMemories } from "@/lib/api";
+import { listMemories } from "@/lib/api";
+import { useMemoryCategories } from "@/hooks/useMemoryCategories";
 import { Loader2, Folder, ArrowRight, Info, CalendarDays } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -19,16 +20,21 @@ interface DateSummary {
 type FolderView = "category" | "date";
 
 export default function FoldersPage() {
-  const [categories, setCategories] = useState<CategorySummary[]>([]);
   const [dateFolders, setDateFolders] = useState<DateSummary[]>([]);
   const [folderView, setFolderView] = useState<FolderView>("category");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { categories, loading: categoriesLoading, error: categoriesError } = useMemoryCategories();
 
   useEffect(() => {
-    Promise.all([getMemoryCategories(), listMemories({ take: 100 })])
-      .then(([categoryData, memories]) => {
-        setCategories(categoryData);
+    let cancelled = false;
+
+    setLoading(true);
+    setError(null);
+
+    listMemories({ take: 100 })
+      .then((memories) => {
+        if (cancelled) return;
         const counts = new Map<string, number>();
         memories.forEach((memory) => {
           const dateKey = memory.createdAt.slice(0, 10);
@@ -39,8 +45,16 @@ export default function FoldersPage() {
           .map(([date, count]) => ({ date, count }));
         setDateFolders(dateData);
       })
-      .catch((err) => setError(err.message || "Failed to load folders"))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load folders");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const activeItems = useMemo(
@@ -88,7 +102,7 @@ export default function FoldersPage() {
         </div>
       </div>
 
-      {loading ? (
+      {loading || categoriesLoading ? (
         <div className="flex flex-col items-center justify-center py-24 gap-6">
           <div className="relative">
             <Loader2 className="w-16 h-16 animate-spin text-indigo-600" />
@@ -98,10 +112,10 @@ export default function FoldersPage() {
           </div>
           <p className="font-black uppercase text-xs tracking-[0.3em] text-gray-400 animate-pulse">Scanning Data Sectors...</p>
         </div>
-      ) : error ? (
+      ) : error || categoriesError ? (
         <div className="brut-card p-12 bg-rose-50 border-rose-500 text-rose-700 text-center max-w-2xl mx-auto shadow-[12px_12px_0px_0px_rgba(244,63,94,1)]">
           <h2 className="heading-brut text-4xl mb-4">Read Error</h2>
-          <p className="font-black mb-8 uppercase text-sm tracking-widest leading-relaxed">{error}</p>
+          <p className="font-black mb-8 uppercase text-sm tracking-widest leading-relaxed">{error ?? categoriesError}</p>
           <button onClick={() => window.location.reload()} className="brut-button bg-rose-500 w-full justify-center py-4">Retry Hardware Scan</button>
         </div>
       ) : activeItems.length === 0 ? (

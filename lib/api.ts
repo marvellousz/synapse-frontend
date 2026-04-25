@@ -255,13 +255,15 @@ export interface ChatMessage {
 
 export async function sendChatMessage(
   message: string,
-  history?: ChatMessage[]
+  history?: ChatMessage[],
+  useInternet: boolean = false
 ): Promise<{ reply: string }> {
   return api<{ reply: string }>("/api/chat", {
     method: "POST",
     body: JSON.stringify({
       message,
       history: history ?? [],
+      useInternet,
     }),
   });
 }
@@ -306,11 +308,12 @@ export async function getChat(chatId: string): Promise<ChatWithMessages> {
 
 export async function sendChatMessageToChat(
   chatId: string,
-  message: string
+  message: string,
+  useInternet: boolean = false
 ): Promise<{ reply: string; userMessageId: string; assistantMessageId: string }> {
   return api<{ reply: string; userMessageId: string; assistantMessageId: string }>(
     `/api/chats/${chatId}/messages`,
-    { method: "POST", body: JSON.stringify({ message }) }
+    { method: "POST", body: JSON.stringify({ message, useInternet }) }
   );
 }
 
